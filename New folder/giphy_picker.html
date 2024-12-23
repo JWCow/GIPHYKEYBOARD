@@ -249,32 +249,6 @@
             color: var(--text-secondary);
             font-size: 14px;
         }
-
-        .recent-searches {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 8px 0;
-            margin-bottom: 8px;
-        }
-
-        .recent-search {
-            font-size: 12px;
-            padding: 4px 8px;
-            background: var(--bg-light);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .recent-search:hover {
-            background: var(--bg-lighter);
-            color: var(--text-primary);
-        }
     </style>
 </head>
 <body>
@@ -286,9 +260,6 @@
 
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Search GIFs..." autofocus>
-        </div>
-        <div id="recent-searches" class="recent-searches">
-            <!-- Recent searches will be added here dynamically -->
         </div>
 
         <div id="ideas-container" style="display: none;">
@@ -320,15 +291,7 @@
         </div>
 
         <div id="results">
-            <div class="empty-state">
-                Type something to search for GIFs!<br><br>
-                <small>
-                    ↑/↓: Scroll &nbsp;•&nbsp; 
-                    Tab: Next GIF &nbsp;•&nbsp; 
-                    Esc: Hide &nbsp;•&nbsp; 
-                    Ctrl+Enter: Copy
-                </small>
-            </div>
+            <div class="empty-state">Type something to search for GIFs!</div>
         </div>
     </div>
 
@@ -450,7 +413,6 @@
                 return;
             }
 
-            addToRecentSearches(query);
             currentQuery = query;
             currentOffset = 0;
             isLoading = true;
@@ -520,39 +482,6 @@
             document.execCommand('copy');
             document.body.removeChild(textarea);
         }
-
-        // Add these functions for recent searches
-        const MAX_RECENT_SEARCHES = 5;
-        const recentSearchesDiv = document.getElementById('recent-searches');
-
-        function addToRecentSearches(query) {
-            if (!query) return;
-            
-            let searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-            // Remove if already exists
-            searches = searches.filter(s => s !== query);
-            // Add to start
-            searches.unshift(query);
-            // Keep only last MAX_RECENT_SEARCHES
-            searches = searches.slice(0, MAX_RECENT_SEARCHES);
-            
-            localStorage.setItem('recentSearches', JSON.stringify(searches));
-            updateRecentSearches();
-        }
-
-        function updateRecentSearches() {
-            const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-            recentSearchesDiv.innerHTML = searches
-                .map(search => `
-                    <div class="recent-search" onclick="searchFor('${search}')">
-                        🔍 ${search}
-                    </div>
-                `)
-                .join('');
-        }
-
-        // Load recent searches on page load
-        window.addEventListener('load', updateRecentSearches);
     </script>
 </body>
 </html> 
