@@ -27,10 +27,10 @@
 
 1. Download the [latest release](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/latest)
 2. Extract the ZIP file to a location you'll remember (e.g., `Documents` folder)
-3. Install AutoHotkey v1.1 (for Windows):
-   - Visit [AutoHotkey Download](https://www.autohotkey.com/download/)
-   - Click "Download AutoHotkey Installer"
-   - Run the installer and follow the prompts
+3. If you don't have AutoHotkey installed:
+   - Run `AutoHotkey_1.1.xx.xx_setup.exe` from the extracted ZIP file
+   - Follow the installer prompts
+   - (Or download directly from [AutoHotkey Download](https://www.autohotkey.com/download/) if you prefer)
 
 ## 🎯 Getting Started
 
