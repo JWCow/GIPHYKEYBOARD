@@ -11,9 +11,45 @@ htmlPath := StrReplace(htmlPath, "\", "/")
 htmlPath := StrReplace(htmlPath, " ", "%20")
 htmlPath := StrReplace(htmlPath, ":", "%3A")
 
+; Get default browser path
+RegRead, browserPath, HKEY_CURRENT_USER, Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice, ProgId
+RegRead, browserCmd, HKEY_CLASSES_ROOT, %browserPath%\shell\open\command
+
+; Extract browser executable path
+browserCmd := RegExReplace(browserCmd, """([^""]+)"".*", "$1")
+if (!browserCmd) {
+    ; Fallback to direct browser paths if registry lookup fails
+    if (FileExist("C:\Program Files\Google\Chrome\Application\chrome.exe"))
+        browserCmd := "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    else if (FileExist("C:\Program Files\Mozilla Firefox\firefox.exe"))
+        browserCmd := "C:\Program Files\Mozilla Firefox\firefox.exe"
+    else if (FileExist("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"))
+        browserCmd := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+}
+
 ; Pre-load browser instance on script start
 PreloadBrowser() {
-    Run, % "file:///" htmlPath
+    global browserCmd
+    Run, % browserCmd 
+        . " --app=""file:///" htmlPath """"
+        . " --window-size=1,1"
+        . " --window-position=-9999,-9999"
+        . " --disable-extensions"
+        . " --disable-plugins"
+        . " --disable-sync"
+        . " --no-first-run"
+        . " --noerrdialogs"
+        . " --disable-translate"
+        . " --disable-features=TranslateUI"
+        . " --disable-save-password-bubble"
+        . " --no-default-browser-check"
+        . " --hide-scrollbars"
+        . " --disable-notifications"
+        . " --disable-background-mode"
+        . " --disable-backing-store-limit"
+        . " --disable-pinch"
+        . " --user-data-dir=""" A_Temp "\GiphyPicker"""
+    
     WinWait, GIPHY Picker
     WinHide, GIPHY Picker
 }
@@ -33,7 +69,25 @@ ShowPicker:
         x := (A_ScreenWidth - width) / 2
         y := (A_ScreenHeight - height) / 2
         
-        Run, % "file:///" htmlPath
+        Run, % browserCmd
+            . " --app=""file:///" htmlPath """"
+            . " --window-size=" width "," height 
+            . " --window-position=" Round(x) "," Round(y)
+            . " --disable-extensions"
+            . " --disable-plugins"
+            . " --disable-sync"
+            . " --no-first-run"
+            . " --noerrdialogs"
+            . " --disable-translate"
+            . " --disable-features=TranslateUI"
+            . " --disable-save-password-bubble"
+            . " --no-default-browser-check"
+            . " --hide-scrollbars"
+            . " --disable-notifications"
+            . " --disable-background-mode"
+            . " --disable-backing-store-limit"
+            . " --disable-pinch"
+            . " --user-data-dir=""" A_Temp "\GiphyPicker"""
         
         WinWait, GIPHY Picker
         WinGet, state, MinMax, GIPHY Picker
