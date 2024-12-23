@@ -2,6 +2,8 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
+![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)
 
 Quick access to GIPHY's vast GIF library right from your keyboard! Press Win+C to instantly search and copy GIFs.
 
@@ -10,11 +12,22 @@ Quick access to GIPHY's vast GIF library right from your keyboard! Press Win+C t
 ### 🎬 Demo
 ![Demo](screenshots/demo.gif)
 
+<table>
+<tr>
+<td width="50%">
+
 ### 🔍 Search Interface
 ![Search Interface](screenshots/search.png)
 
+</td>
+<td width="50%">
+
 ### 💡 GIF Ideas
 ![GIF Ideas](screenshots/ideas.png)
+
+</td>
+</tr>
+</table>
 
 </div>
 
