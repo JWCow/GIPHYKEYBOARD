@@ -26,9 +26,27 @@
 ## 🚀 Installation
 
 1. Download the [latest release](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/latest)
-2. Extract the ZIP file
-3. Install AutoHotkey v1.1 (for Windows)
-4. Run `giphy_hotkey.ahk`
+2. Extract the ZIP file to a location you'll remember (e.g., `Documents` folder)
+3. Install AutoHotkey v1.1 (for Windows):
+   - Visit [AutoHotkey Download](https://www.autohotkey.com/download/)
+   - Click "Download AutoHotkey Installer"
+   - Run the installer and follow the prompts
+
+## 🎯 Getting Started
+
+1. Navigate to where you extracted the ZIP file
+2. Double-click `giphy_hotkey.ahk` to run the program
+3. You should see the AutoHotkey icon (green "H") appear in your system tray
+4. Press `Win + C` to open the GIPHY picker
+5. Type something to search for GIFs!
+
+💡 **Pro Tips:**
+- To have the program start automatically with Windows:
+  1. Press `Win + R`
+  2. Type `shell:startup`
+  3. Create a shortcut to `giphy_hotkey.ahk` in this folder
+- To quit the program, right-click the AutoHotkey icon in the system tray and select "Exit"
+- First launch might take a few seconds as it sets up your browser
 
 That's it! No API keys or extra setup needed. 🎉
 
