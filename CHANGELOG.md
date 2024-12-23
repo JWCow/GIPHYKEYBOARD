@@ -1,36 +1,44 @@
 # Changelog
-All notable changes to GIPHY Keyboard for Windows will be documented in this file.
 
-## [1.0.2] - 2024-03-20
-
-### Changed
-- Improved UI layout and responsiveness
-- Fixed file path handling in AutoHotkey script
-- Enhanced window positioning and sizing
-
-## [1.0.1] - 2024-03-20
-
+## [1.0.2] - 2024-01-14
 ### Added
-- Open Graph and Twitter Card metadata for better link sharing
-- Notification system when copying GIF URLs
-- Favicon support
-- Better error handling for clipboard operations
+- Universal browser support (Chrome, Edge, Firefox)
+- Automatic browser detection and optimization
+- Multi-monitor support
+- Recent searches history
+- Keyboard shortcuts help
+- Technical documentation
 
 ### Changed
-- Improved clipboard interaction with async/await pattern
-- Enhanced visual feedback when copying GIFs
+- Improved window management
+- Enhanced performance optimizations
+- Simplified installation process
+- Better documentation and screenshots
 
 ### Fixed
-- Clipboard operation error handling
-- Multiple notification stacking issues
+- Browser compatibility issues
+- Window positioning on multiple monitors
+- Installation instructions clarity
 
-## [1.0.0] - 2024-03-20
+## [1.0.1] - 2024-01-13
+### Added
+- Recent searches feature
+- Keyboard shortcuts help
+- Improved error handling
+- Better user feedback
 
+### Changed
+- Enhanced UI responsiveness
+- Updated documentation
+
+## [1.0.0] - 2024-01-12
 ### Added
 - Initial release
-- Windows keyboard shortcut (Win + C) to toggle GIPHY picker
+- Windows keyboard shortcut (Win + C)
 - Fast GIF search with instant results
 - Dark mode interface
 - Infinite scroll loading
 - One-click GIF URL copying
-- Escape key to close picker 
+- Escape key to close picker
+- GIPHY API integration
+- Basic window management
