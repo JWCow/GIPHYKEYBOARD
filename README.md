@@ -47,6 +47,7 @@ That's it! No API keys or extra setup needed. 🎉
 ## 📝 Notes
 
 * Works right out of the box with GIPHY's public API
+* Works with any modern web browser
 * The hotkey functionality is Windows-only (requires AutoHotkey)
 * The web interface itself is cross-platform compatible
 

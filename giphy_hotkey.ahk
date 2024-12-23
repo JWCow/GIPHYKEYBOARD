@@ -5,35 +5,15 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory
 ; Global variables
 global width := 400
 global height := 600
-global thoriumPath := "E:\OneDrive\NEW COMPUTER INSTALL\Thorium_117.0.5938.157\BIN\thorium.exe"
 global htmlPath := A_ScriptDir "\giphy_picker.html"
 global iniFile := A_ScriptDir "\giphy_settings.ini"
 htmlPath := StrReplace(htmlPath, "\", "/")
 htmlPath := StrReplace(htmlPath, " ", "%20")
 htmlPath := StrReplace(htmlPath, ":", "%3A")
 
-; Pre-load Thorium instance on script start
+; Pre-load browser instance on script start
 PreloadBrowser() {
-    Run, % thoriumPath 
-        . " --app=""file:///" htmlPath """"
-        . " --window-size=1,1"
-        . " --window-position=-9999,-9999"
-        . " --disable-extensions"
-        . " --disable-plugins"
-        . " --disable-sync"
-        . " --no-first-run"
-        . " --noerrdialogs"
-        . " --disable-translate"
-        . " --disable-features=TranslateUI"
-        . " --disable-save-password-bubble"
-        . " --no-default-browser-check"
-        . " --hide-scrollbars"
-        . " --disable-notifications"
-        . " --disable-background-mode"
-        . " --disable-backing-store-limit"
-        . " --disable-pinch"
-        . " --user-data-dir=""" A_Temp "\GiphyPicker"""
-    
+    Run, % "file:///" htmlPath
     WinWait, GIPHY Picker
     WinHide, GIPHY Picker
 }
@@ -53,25 +33,7 @@ ShowPicker:
         x := (A_ScreenWidth - width) / 2
         y := (A_ScreenHeight - height) / 2
         
-        Run, % thoriumPath
-            . " --app=""file:///" htmlPath """"
-            . " --window-size=" width "," height 
-            . " --window-position=" Round(x) "," Round(y)
-            . " --disable-extensions"
-            . " --disable-plugins"
-            . " --disable-sync"
-            . " --no-first-run"
-            . " --noerrdialogs"
-            . " --disable-translate"
-            . " --disable-features=TranslateUI"
-            . " --disable-save-password-bubble"
-            . " --no-default-browser-check"
-            . " --hide-scrollbars"
-            . " --disable-notifications"
-            . " --disable-background-mode"
-            . " --disable-backing-store-limit"
-            . " --disable-pinch"
-            . " --user-data-dir=""" A_Temp "\GiphyPicker"""
+        Run, % "file:///" htmlPath
         
         WinWait, GIPHY Picker
         WinGet, state, MinMax, GIPHY Picker
@@ -110,19 +72,6 @@ Down::Send {WheelDown}
 Tab::Send {Tab}
 ; Ctrl+Enter to quickly copy focused GIF
 ^Enter::Send ^c
-; Ctrl+T for transparency
-^t::WinSet, Transparent, 200, GIPHY Picker
-; Ctrl+Shift+T to remove transparency
-^+t::WinSet, Transparent, OFF, GIPHY Picker
-; Ctrl+Space to toggle always on top
-^Space::
-    WinSet, AlwaysOnTop, Toggle, GIPHY Picker
-    return
-
-; Add this function to handle the pin icon clicks
-togglePin:
-    WinSet, AlwaysOnTop, Toggle, GIPHY Picker
-    return
 #IfWinActive
 
 SaveWindowPosition() {
