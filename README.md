@@ -1,6 +1,15 @@
 # GIPHY Keyboard for Windows 🎮
 
-A lightweight, fast GIPHY picker that can be triggered with a keyboard shortcut. Search and copy GIFs directly to your clipboard with minimal friction. ⚡ (v1.0.1)
+<div align="center">
+
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows)
+[![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)](https://www.autohotkey.com/)
+
+</div>
+
+> 🚀 A lightning-fast GIPHY search tool that lives in your keyboard shortcuts. Find and share GIFs instantly without leaving your current window.
 
 ## ✨ Features
 
@@ -10,6 +19,7 @@ A lightweight, fast GIPHY picker that can be triggered with a keyboard shortcut.
 * 📋 Copy GIF URLs to clipboard with a single click
 * 🌙 Clean, modern dark mode interface
 * ♾️ Infinite scroll loading
+* 🕒 Recent searches history
 
 ## 🚀 Installation
 
@@ -28,6 +38,11 @@ A lightweight, fast GIPHY picker that can be triggered with a keyboard shortcut.
 * Click on a GIF to copy its URL to clipboard
 * Use the "GIF Ideas" tab for inspiration
 * Press `Esc` to close the picker
+* Use keyboard shortcuts:
+  * ↑/↓: Scroll through results
+  * Tab: Navigate between GIFs
+  * Ctrl+Enter: Copy selected GIF
+  * Esc: Hide window
 
 ## 📝 Notes
 
