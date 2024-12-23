@@ -9,9 +9,6 @@
 
 > 🚀 A lightning-fast GIPHY search tool that lives in your keyboard shortcuts. Find and share GIFs instantly without leaving your current window.
 
-### 🎬 Demo
-![Demo](screenshots/demo.gif)
-
 <table>
 <tr>
 <td width="50%">
