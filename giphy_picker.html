@@ -1,82 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GIPHY Picker</title>
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://giphykeyboard.com/">
-    <meta property="og:title" content="GIPHY Keyboard for Windows">
-    <meta property="og:description" content="Quick access to millions of GIFs with a keyboard shortcut. Search, copy, and share GIFs instantly.">
-    <meta property="og:image" content="https://i.imgur.com/YOURIMAGE.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://giphykeyboard.com/">
-    <meta property="twitter:title" content="GIPHY Keyboard for Windows">
-    <meta property="twitter:description" content="Quick access to millions of GIFs with a keyboard shortcut. Search, copy, and share GIFs instantly.">
-    <meta property="twitter:image" content="https://i.imgur.com/YOURIMAGE.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
-    
+    <script src="https://giphy.com/static/sdk.min.js"></script>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #main-container {
             padding: 20px;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        #search-container {
+            margin-bottom: 20px;
         }
 
-        .search-box {
+        #search-input {
             width: 100%;
             padding: 12px;
+            font-size: 16px;
             border: none;
             border-radius: 8px;
-            background: #333;
-            color: #fff;
-            margin-bottom: 20px;
-            font-size: 16px;
+            background: #2a2a2a;
+            color: white;
+            outline: none;
         }
 
-        .tabs {
+        #search-input:focus {
+            background: #333;
+        }
+
+        #ideas-container {
+            margin-bottom: 20px;
+        }
+
+        .ideas-section {
+            margin-bottom: 15px;
+        }
+
+        .ideas-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .ideas-tags {
             display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        .tab {
+        .idea-tag {
+            background: #2a2a2a;
             padding: 8px 16px;
-            background: #333;
-            border: none;
-            border-radius: 6px;
-            color: #fff;
+            border-radius: 20px;
             cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
         }
 
-        .tab.active {
-            background: #666;
+        .idea-tag:hover {
+            background: #3a3a3a;
+            transform: translateY(-1px);
         }
 
-        .gif-grid {
+        #results {
+            flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: 160px;
+            gap: 12px;
+            overflow-y: auto;
+            padding: 12px;
+            max-height: calc(100vh - 140px);
+        }
+
+        #results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #results::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        #results::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        #results::-webkit-scrollbar-thumb:hover {
+            background: #444;
         }
 
         .gif-item {
             cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
             border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.2s;
+            height: 100%;
         }
 
         .gif-item:hover {
@@ -85,136 +125,246 @@
 
         .gif-item img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
         }
 
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            color: #000;
-            padding: 12px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
         }
 
-        .notification.show {
-            opacity: 1;
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #aaa;
+        }
+
+        .tab.active {
+            color: white;
+            border-bottom: 2px solid #00ff00;
+        }
+
+        .copy-tooltip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 255, 0, 0.9);
+            color: black;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: none;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <input type="text" class="search-box" placeholder="Search GIFs...">
-        
+    <div id="main-container">
         <div class="tabs">
-            <button class="tab active">Search</button>
-            <button class="tab">GIF Ideas</button>
+            <div class="tab active" data-tab="search">Search</div>
+            <div class="tab" data-tab="ideas">GIF Ideas</div>
         </div>
 
-        <div class="gif-grid" id="gifGrid"></div>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Search GIFs...">
+        </div>
+
+        <div id="ideas-container" style="display: none;">
+            <div class="ideas-section">
+                <div class="ideas-title">Trending Categories</div>
+                <div class="ideas-tags" id="trending-categories"></div>
+            </div>
+            <div class="ideas-section">
+                <div class="ideas-title">Popular Reactions</div>
+                <div class="ideas-tags">
+                    <div class="idea-tag" onclick="searchFor('happy')">Happy</div>
+                    <div class="idea-tag" onclick="searchFor('sad')">Sad</div>
+                    <div class="idea-tag" onclick="searchFor('angry')">Angry</div>
+                    <div class="idea-tag" onclick="searchFor('love')">Love</div>
+                    <div class="idea-tag" onclick="searchFor('funny')">Funny</div>
+                    <div class="idea-tag" onclick="searchFor('wow')">Wow</div>
+                </div>
+            </div>
+            <div class="ideas-section">
+                <div class="ideas-title">Popular Actions</div>
+                <div class="ideas-tags">
+                    <div class="idea-tag" onclick="searchFor('thumbs up')">Thumbs Up</div>
+                    <div class="idea-tag" onclick="searchFor('clapping')">Clapping</div>
+                    <div class="idea-tag" onclick="searchFor('facepalm')">Facepalm</div>
+                    <div class="idea-tag" onclick="searchFor('shrug')">Shrug</div>
+                    <div class="idea-tag" onclick="searchFor('dance')">Dance</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results"></div>
     </div>
 
     <script>
-        const API_KEY = 'YOUR_GIPHY_API_KEY';
-        const searchBox = document.querySelector('.search-box');
-        const gifGrid = document.getElementById('gifGrid');
+        const API_KEY = 'GlVGYHkr3WSBnllca54iNt0yFbjz7L65';
+        const searchInput = document.getElementById('search-input');
+        const resultsDiv = document.getElementById('results');
+        const ideasContainer = document.getElementById('ideas-container');
+        let searchTimeout;
         let currentOffset = 0;
+        let currentQuery = '';
         let isLoading = false;
 
-        async function searchGifs(query) {
-            const url = `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&offset=${currentOffset}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.data;
-        }
+        // Initialize GIPHY SDK
+        window.addEventListener('load', () => {
+            window.giphySDK = new window.GiphySDK(API_KEY);
+        });
 
-        function createGifElement(gif) {
-            const div = document.createElement('div');
-            div.className = 'gif-item';
-            const img = document.createElement('img');
-            img.src = gif.images.fixed_height.url;
-            div.appendChild(img);
-            
-            div.addEventListener('click', async () => {
-                try {
-                    await navigator.clipboard.writeText(gif.images.original.url);
-                    showNotification('GIF URL copied to clipboard! 📋');
-                } catch (err) {
-                    showNotification('Failed to copy URL 😢');
-                }
-            });
-
-            return div;
-        }
-
-        async function handleSearch() {
-            const query = searchBox.value.trim();
-            if (!query) return;
-
-            gifGrid.innerHTML = '';
-            currentOffset = 0;
-            const gifs = await searchGifs(query);
-            gifs.forEach(gif => {
-                gifGrid.appendChild(createGifElement(gif));
-            });
-        }
-
-        searchBox.addEventListener('input', debounce(handleSearch, 500));
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        // Infinite scroll
-        window.addEventListener('scroll', () => {
+        // Add scroll event listener
+        resultsDiv.addEventListener('scroll', () => {
             if (isLoading) return;
             
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
-                isLoading = true;
-                currentOffset += 20;
-                handleSearch().then(() => {
-                    isLoading = false;
-                });
+            const scrollPosition = resultsDiv.scrollTop + resultsDiv.clientHeight;
+            const scrollHeight = resultsDiv.scrollHeight;
+            
+            // If we're near the bottom, load more GIFs
+            if (scrollHeight - scrollPosition < 100) {
+                loadMoreGifs();
             }
         });
 
-        function showNotification(message) {
-            // Remove existing notification if any
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
+        // Add tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                searchInput.parentElement.style.display = 'none';
+                ideasContainer.style.display = 'none';
+                resultsDiv.innerHTML = '';
+
+                if (tab.dataset.tab === 'ideas') {
+                    ideasContainer.style.display = 'block';
+                    loadTrendingCategories();
+                } else {
+                    searchInput.parentElement.style.display = 'block';
+                }
+            });
+        });
+
+        async function loadMoreGifs() {
+            if (!currentQuery || isLoading) return;
+            
+            isLoading = true;
+            currentOffset += 10;
+            
+            try {
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=10&offset=${currentOffset}`);
+                const data = await response.json();
+                appendResults(data.data);
+            } catch (error) {
+                console.error('Error fetching more GIFs:', error);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function appendResults(gifs) {
+            const newGifs = gifs
+                .map(gif => `
+                    <div class="gif-item" onclick="copyToClipboard('https://media.giphy.com/media/${gif.id}/giphy.gif')">
+                        <img src="${gif.images.fixed_height.url}" alt="${gif.title}">
+                        <div class="copy-tooltip">Copied!</div>
+                    </div>
+                `)
+                .join('');
+            
+            resultsDiv.insertAdjacentHTML('beforeend', newGifs);
+
+            // Add click handlers for the new items
+            document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
+                div.setAttribute('data-handler', 'true');
+                div.addEventListener('click', () => {
+                    const tooltip = div.querySelector('.copy-tooltip');
+                    tooltip.style.display = 'block';
+                    div.style.outline = '2px solid #00ff00';
+                    
+                    setTimeout(() => {
+                        tooltip.style.display = 'none';
+                        div.style.outline = 'none';
+                    }, 1000);
+                });
+            });
+        }
+
+        async function searchGifs() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                resultsDiv.innerHTML = '';
+                currentQuery = '';
+                currentOffset = 0;
+                return;
             }
 
-            // Create and show new notification
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            document.body.appendChild(notification);
+            currentQuery = query;
+            currentOffset = 0;
+            isLoading = true;
 
-            // Trigger animation
-            setTimeout(() => notification.classList.add('show'), 10);
-
-            // Remove notification after delay
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
+            try {
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=10&offset=0`);
+                const data = await response.json();
+                resultsDiv.innerHTML = '';  // Clear existing results
+                appendResults(data.data);
+            } catch (error) {
+                console.error('Error fetching GIFs:', error);
+            } finally {
+                isLoading = false;
+            }
         }
+
+        // Debounced search
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchGifs, 500);
+        });
+
+        async function loadTrendingCategories() {
+            try {
+                const response = await fetch(`https://api.giphy.com/v1/trending/searches?api_key=${API_KEY}`);
+                const data = await response.json();
+                const categories = data.data.slice(0, 10);
+                
+                const container = document.getElementById('trending-categories');
+                container.innerHTML = categories
+                    .map(category => `<div class="idea-tag" onclick="searchFor('${category}')">${category}</div>`)
+                    .join('');
+            } catch (error) {
+                console.error('Error loading trending categories:', error);
+            }
+        }
+
+        function searchFor(query) {
+            searchInput.value = query;
+            document.querySelector('[data-tab="search"]').click();
+            searchGifs();
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
+        // Initial focus
+        searchInput.focus();
     </script>
 </body>
 </html> 
