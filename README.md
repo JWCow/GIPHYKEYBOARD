@@ -27,9 +27,9 @@
    * `giphy_picker.html`
    * `giphy_hotkey.ahk`
 2. Install AutoHotkey v1.1 (for Windows)
-3. Get a GIPHY API key from [developers.giphy.com](https://developers.giphy.com)
-4. Replace `YOUR_GIPHY_API_KEY` in `giphy_picker.html` with your actual API key
-5. Run the `giphy_hotkey.ahk` script
+3. Run the `giphy_hotkey.ahk` script
+
+That's it! No API keys or extra setup needed. 🎉
 
 ## 🎮 Usage
 
@@ -46,7 +46,7 @@
 
 ## 📝 Notes
 
-* You'll need to obtain a GIPHY API key for the picker to work
+* Works right out of the box with GIPHY's public API
 * The hotkey functionality is Windows-only (requires AutoHotkey)
 * The web interface itself is cross-platform compatible
 
