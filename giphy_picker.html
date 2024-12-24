@@ -50,6 +50,13 @@
             max-height: calc(100vh - 32px);
         }
 
+        .search-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
         .search-bar {
             padding: 16px;
             background: var(--bg-light);
@@ -67,12 +74,12 @@
         #results, #my-gifs-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 8px;
+            gap: 16px;
+            padding: 12px;
             border-radius: var(--radius-md);
             background: var(--bg-light);
-            flex: 1;
-            grid-auto-flow: dense;
+            min-height: 200px;
+            overflow: visible;
         }
 
         #my-gifs-container {
@@ -186,6 +193,10 @@
             width: 100%;
             background: var(--bg-darker);
             box-shadow: var(--shadow);
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .favorite-btn {
@@ -222,10 +233,14 @@
         }
 
         .gif-item img {
-            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
             height: auto;
+            object-fit: contain;
             display: block;
             transition: var(--transition);
+            background: var(--bg-darker);
         }
 
         .gif-item:hover img {
@@ -445,11 +460,24 @@
             <div class="tab" data-tab="my-gifs">⭐ My GIFs</div>
         </div>
 
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Search GIFs..." autofocus>
-        </div>
-        <div id="recent-searches" class="recent-searches">
-            <!-- Recent searches will be added here dynamically -->
+        <div class="search-content">
+            <div id="search-container">
+                <input type="text" id="search-input" placeholder="Search GIFs..." autofocus>
+            </div>
+            <div id="recent-searches" class="recent-searches">
+                <!-- Recent searches will be added here dynamically -->
+            </div>
+            <div id="results">
+                <div class="empty-state">
+                    Type something to search for GIFs!<br><br>
+                    <small>
+                        ↑/↓: Scroll &nbsp;•&nbsp; 
+                        Tab: Next GIF &nbsp;•&nbsp; 
+                        Esc: Hide &nbsp;•&nbsp; 
+                        Ctrl+Enter: Copy
+                    </small>
+                </div>
+            </div>
         </div>
 
         <div id="ideas-container" style="display: none;">
@@ -489,18 +517,6 @@
             </div>
             <div id="my-gifs-grid"></div>
         </div>
-
-        <div id="results">
-            <div class="empty-state">
-                Type something to search for GIFs!<br><br>
-                <small>
-                    ↑/↓: Scroll &nbsp;•&nbsp; 
-                    Tab: Next GIF &nbsp;•&nbsp; 
-                    Esc: Hide &nbsp;•&nbsp; 
-                    Ctrl+Enter: Copy
-                </small>
-            </div>
-        </div>
     </div>
 
     <div class="loading-spinner"></div>
@@ -530,11 +546,12 @@
         };
 
         // Add scroll event listener
-        resultsDiv.addEventListener('scroll', () => {
+        document.getElementById('main-container').addEventListener('scroll', () => {
             if (isLoading) return;
             
-            const scrollPosition = resultsDiv.scrollTop + resultsDiv.clientHeight;
-            const scrollHeight = resultsDiv.scrollHeight;
+            const container = document.getElementById('main-container');
+            const scrollPosition = container.scrollTop + container.clientHeight;
+            const scrollHeight = container.scrollHeight;
             
             if (scrollHeight - scrollPosition < 100) {
                 loadMoreGifs();
@@ -577,7 +594,7 @@
             currentOffset += 10;
             
             try {
-                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=10&offset=${currentOffset}`);
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=10&offset=${currentOffset}&rating=g&lang=en`);
                 const data = await response.json();
                 appendResults(data.data);
             } catch (error) {
@@ -603,10 +620,10 @@
                     return `
                         <div class="gif-item" data-gif-id="${gif.id}">
                             <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
-                                    onclick="toggleFavorite(event, '${gif.id}', '${gif.images.fixed_height.url}', '${gif.title.replace(/'/g, "\\'")}')">
+                                    onclick="toggleFavorite(event, '${gif.id}', '${gif.images.original.url}', '${gif.title.replace(/'/g, "\\'")}')">
                                 ${isFavorite ? '⭐' : '☆'}
                             </button>
-                            <img src="${gif.images.fixed_height.url}" 
+                            <img src="${gif.images.original.url}" 
                                  alt="${gif.title}" 
                                  loading="lazy" 
                                  onclick="copyToClipboard('https://media.giphy.com/media/${gif.id}/giphy.gif', event)">
@@ -616,8 +633,16 @@
                 })
                 .join('');
             
-            container.insertAdjacentHTML('beforeend', newGifs);
+            // Create a temporary container
+            const temp = document.createElement('div');
+            temp.innerHTML = newGifs;
+            
+            // Append each GIF individually
+            while (temp.firstChild) {
+                container.appendChild(temp.firstChild);
+            }
 
+            // Add event listeners to new GIFs
             document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
                 div.setAttribute('data-handler', 'true');
                 const tooltip = div.querySelector('.copy-tooltip');
@@ -650,7 +675,7 @@
             showLoading(true);
 
             try {
-                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=10&offset=0`);
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=10&offset=0&rating=g&lang=en`);
                 const data = await response.json();
                 
                 if (data.data.length === 0) {
