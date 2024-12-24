@@ -123,7 +123,7 @@
             border-radius: var(--radius-md);
             background: var(--bg-light);
             max-height: calc(100vh - 200px);
-            align-items: start;
+            grid-auto-flow: dense;
         }
 
         #results::-webkit-scrollbar {
@@ -151,7 +151,6 @@
             border-radius: var(--radius-md);
             overflow: hidden;
             width: 100%;
-            aspect-ratio: 4/3;
             background: var(--bg-darker);
             box-shadow: var(--shadow);
         }
@@ -191,8 +190,7 @@
 
         .gif-item img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
             transition: var(--transition);
         }
@@ -453,7 +451,7 @@
             background: var(--bg-light);
             max-height: calc(100vh - 250px);
             flex: 1;
-            align-items: start;
+            grid-auto-flow: dense;
         }
     </style>
 </head>
@@ -623,9 +621,8 @@
             const newGifs = gifs
                 .map(gif => {
                     const isFavorite = favorites.includes(gif.id);
-                    const aspectRatio = gif.images.fixed_height.width / gif.images.fixed_height.height;
                     return `
-                        <div class="gif-item" data-gif-id="${gif.id}" style="aspect-ratio: ${aspectRatio}">
+                        <div class="gif-item" data-gif-id="${gif.id}">
                             <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
                                     onclick="toggleFavorite(event, '${gif.id}', '${gif.images.fixed_height.url}', '${gif.title.replace(/'/g, "\\'")}')">
                                 ${isFavorite ? '⭐' : '☆'}
@@ -891,40 +888,21 @@
             // Sort by newest first
             allGifs.sort((a, b) => b.timestamp - a.timestamp);
 
-            // Create a temporary image to get dimensions
-            const getAspectRatio = (url) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        resolve(img.width / img.height);
-                    };
-                    img.onerror = () => {
-                        resolve(4/3); // Default aspect ratio if image fails to load
-                    };
-                    img.src = url;
-                });
-            };
+            // Process all GIFs
+            const gifElements = allGifs.map(gif => `
+                <div class="gif-item ${gif.isLocal ? 'local-gif' : ''}" data-gif-id="${gif.id}">
+                    ${gif.isLocal ? 
+                        `<button class="delete-gif" onclick="deleteLocalGif('${gif.id}', event)">×</button>` :
+                        `<button class="favorite-btn active" onclick="toggleFavorite(event, '${gif.id}', '${gif.url}', '${gif.title}')">⭐</button>`
+                    }
+                    <img src="${gif.url}" 
+                         alt="${gif.title}" 
+                         loading="lazy" 
+                         onclick="copyToClipboard('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">
+                    <div class="copy-tooltip">Copied! 📋</div>
+                </div>
+            `);
 
-            // Process all GIFs to get their aspect ratios
-            const gifPromises = allGifs.map(async (gif) => {
-                const aspectRatio = await getAspectRatio(gif.url);
-                return `
-                    <div class="gif-item ${gif.isLocal ? 'local-gif' : ''}" data-gif-id="${gif.id}" style="aspect-ratio: ${aspectRatio}">
-                        ${gif.isLocal ? 
-                            `<button class="delete-gif" onclick="deleteLocalGif('${gif.id}', event)">×</button>` :
-                            `<button class="favorite-btn active" onclick="toggleFavorite(event, '${gif.id}', '${gif.url}', '${gif.title}')">⭐</button>`
-                        }
-                        <img src="${gif.url}" 
-                             alt="${gif.title}" 
-                             loading="lazy" 
-                             onclick="copyToClipboard('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">
-                        <div class="copy-tooltip">Copied! 📋</div>
-                    </div>
-                `;
-            });
-
-            // Wait for all GIFs to be processed
-            const gifElements = await Promise.all(gifPromises);
             myGifsGrid.innerHTML = gifElements.join('');
 
             // Add click handlers
