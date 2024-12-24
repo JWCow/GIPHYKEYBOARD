@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.9] - 2024-01-09
+
+### Added
+- Added hover buttons for copying and downloading GIFs
+- Added smart GIF compression for files over 2MB (reduces by 50%)
+- Added automatic size optimization using GIPHY's downsized versions
+- Added support for downloading private GIFs
+
+### Changed
+- Improved GIF downloading with better size handling
+- Updated UI with hover effects and action messages
+- All downloads now save as 'temp.gif' and overwrite previous file
+
+### Fixed
+- Fixed issues with GIF animation preservation during compression
+- Fixed private GIF handling and downloading
+
 ## [1.0.8] - 2024-01-09
 
 ### Added

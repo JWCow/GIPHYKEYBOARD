@@ -139,3 +139,9 @@ MIT License - feel free to modify and share!
 
 * [CONTRIBUTING.md](CONTRIBUTING.md) - Guidelines for contributors
 * [CHANGELOG.md](CHANGELOG.md) - Version history and updates
+
+## Latest Updates
+Check out [Version 1.0.9](CHANGELOG.md#109---2024-01-09) for the latest improvements including:
+- Smart GIF compression and size optimization
+- Hover buttons for copying and downloading
+- Better handling of private GIFs
