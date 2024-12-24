@@ -2,9 +2,7 @@
 
 A modern, sleek GIPHY client for Windows that makes it easy to search, save, and use GIFs.
 
-## Latest Version: 1.0.8
-
-### Features
+## Features
 - 🔍 Explore GIFs with instant search
 - ✨ Browse trending GIFs and categories
 - ❤️ Save your favorite GIFs
@@ -14,16 +12,9 @@ A modern, sleek GIPHY client for Windows that makes it easy to search, save, and
 - 🎨 Modern dark theme interface
 - ⌨️ Keyboard shortcuts for quick access
 
-### Recent Updates (v1.0.8)
-- Improved UI consistency
-- Enhanced dark theme
-- Better input field styling
-- Smoother animations
-- Updated tab navigation
-
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
+[![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows)
 [![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)](https://www.autohotkey.com/)
@@ -67,12 +58,11 @@ A modern, sleek GIPHY client for Windows that makes it easy to search, save, and
 
 ## 📦 Latest Updates
 
-- **[v1.0.6](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.6)** - Added separate My Favorites tab with heart icons
+- **[v1.0.8](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.8)** - Improved UI consistency and dark theme
+- **[v1.0.7](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.7)** - Enhanced My GIFs management
+- **[v1.0.6](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.6)** - Added separate My Favorites tab
 - **[v1.0.5](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.5)** - Improved grid layout and GIF display
-- **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support and improved UI responsiveness
-- **[v1.0.3](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.3)** - Added favorite GIFs functionality with local storage
-- **[v1.0.2](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.2)** - Universal browser support and optimizations
-- **[v1.0.1](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.1)** - Added recent searches and keyboard shortcuts
+- **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support
 
 [View full changelog →](CHANGELOG.md)
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.0.8] - 2024-01-09
+
+### Added
+- Improved UI consistency across all tabs
+- Added border styling to input fields
+- Updated tab names for better clarity
+- Added smooth animations for tab transitions
+- Consistent dark theme colors throughout the app
+
+### Changed
+- Unified input field styling with dark theme
+- Improved tab hover effects
+- Reduced spacing between elements for better layout
+- Updated color scheme for better contrast
+
+### Fixed
+- Fixed input field contrast issues
+- Improved visual feedback on hover states
+
 ## [1.0.6] - 2024-01-14
 ### Added
 - New "My Favorites" tab with heart icon
