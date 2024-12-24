@@ -457,6 +457,44 @@
             flex: 1;
             grid-auto-flow: dense;
         }
+
+        #my-favorites-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        #my-favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            overflow-y: scroll;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            background: var(--bg-light);
+            min-height: 0;
+            max-height: 100%;
+        }
+
+        #my-favorites-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #my-favorites-grid::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: var(--radius-sm);
+        }
+
+        #my-favorites-grid::-webkit-scrollbar-thumb {
+            background: var(--bg-lighter);
+            border-radius: var(--radius-sm);
+        }
+
+        #my-favorites-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -464,6 +502,7 @@
         <div class="tabs">
             <div class="tab active" data-tab="search">🔍 Search</div>
             <div class="tab" data-tab="ideas">💡 GIF Ideas</div>
+            <div class="tab" data-tab="my-favorites">❤️ My Favorites</div>
             <div class="tab" data-tab="my-gifs">⭐ My GIFs</div>
         </div>
 
@@ -493,7 +532,7 @@
             <div class="ideas-section">
                 <div class="ideas-title">👋 Popular Actions</div>
                 <div class="ideas-tags">
-                    <div class="idea-tag" onclick="searchFor('thumbs up')">���� Thumbs Up</div>
+                    <div class="idea-tag" onclick="searchFor('thumbs up')">👍 Thumbs Up</div>
                     <div class="idea-tag" onclick="searchFor('clapping')">👏 Clapping</div>
                     <div class="idea-tag" onclick="searchFor('facepalm')">🤦 Facepalm</div>
                     <div class="idea-tag" onclick="searchFor('shrug')">🤷 Shrug</div>
@@ -510,6 +549,16 @@
                 </div>
             </div>
             <div id="my-gifs-grid"></div>
+        </div>
+
+        <div id="my-favorites-container">
+            <div class="upload-section">
+                <div class="giphy-url-input">
+                    <input type="text" id="favorite-url-input" class="url-input" placeholder="Paste GIPHY URL" />
+                    <button id="add-favorite-btn" class="add-url-btn">Add to My Favorites</button>
+                </div>
+            </div>
+            <div id="my-favorites-grid"></div>
         </div>
 
         <div id="results">
@@ -549,6 +598,23 @@
             }
             // Focus search input
             searchInput.focus();
+
+            // Add click handlers for Add buttons
+            document.getElementById('add-url-btn').addEventListener('click', addGiphyUrl);
+            document.getElementById('add-favorite-btn').addEventListener('click', addFavoriteUrl);
+
+            // Add keyboard event listeners for URL inputs
+            document.getElementById('giphy-url-input').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addGiphyUrl();
+                }
+            });
+
+            document.getElementById('favorite-url-input').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addFavoriteUrl();
+                }
+            });
         };
 
         // Add scroll event listener
@@ -575,6 +641,7 @@
                 searchInput.parentElement.style.display = 'none';
                 ideasContainer.style.display = 'none';
                 document.getElementById('my-gifs-container').style.display = 'none';
+                document.getElementById('my-favorites-container').style.display = 'none';
                 resultsDiv.style.display = 'none';
 
                 // Show selected container
@@ -585,6 +652,10 @@
                     document.getElementById('my-gifs-container').style.display = 'block';
                     document.getElementById('my-gifs-grid').style.display = 'grid';
                     loadUserGifs();
+                } else if (tab.dataset.tab === 'my-favorites') {
+                    document.getElementById('my-favorites-container').style.display = 'block';
+                    document.getElementById('my-favorites-grid').style.display = 'grid';
+                    loadUserFavorites();
                 } else {
                     searchInput.parentElement.style.display = 'block';
                     resultsDiv.style.display = 'grid';
@@ -622,7 +693,7 @@
             }
 
             // Get favorites from local storage
-            const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+            const favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
 
             const newGifs = gifs
                 .map(gif => {
@@ -631,7 +702,7 @@
                         <div class="gif-item" data-gif-id="${gif.id}">
                             <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
                                     onclick="toggleFavorite(event, '${gif.id}', '${gif.images.fixed_height.url}', '${gif.title.replace(/'/g, "\\'")}')">
-                                ${isFavorite ? '⭐' : '☆'}
+                                ${isFavorite ? '❤️' : '🤍'}
                             </button>
                             <img src="${gif.images.fixed_height.url}" 
                                  alt="${gif.title}" 
@@ -763,14 +834,14 @@
         function toggleFavorite(event, gifId, gifUrl, gifTitle) {
             event.stopPropagation();
             const btn = event.target;
-            let favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
-            let favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+            let favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
+            let favoriteData = JSON.parse(localStorage.getItem('userFavoriteGifsData') || '{}');
             
             if (favorites.includes(gifId)) {
                 // Remove from favorites
                 favorites = favorites.filter(id => id !== gifId);
                 delete favoriteData[gifId];
-                btn.textContent = '☆';
+                btn.textContent = '🤍';
                 btn.classList.remove('active');
             } else {
                 // Add to favorites
@@ -780,12 +851,18 @@
                     title: gifTitle,
                     timestamp: Date.now()
                 };
-                btn.textContent = '⭐';
+                btn.textContent = '❤️';
                 btn.classList.add('active');
             }
             
-            localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
-            localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
+            localStorage.setItem('userFavoriteGifs', JSON.stringify(favorites));
+            localStorage.setItem('userFavoriteGifsData', JSON.stringify(favoriteData));
+
+            // Refresh My Favorites tab if it's currently visible
+            const myFavoritesContainer = document.getElementById('my-favorites-container');
+            if (myFavoritesContainer.style.display !== 'none') {
+                loadUserFavorites();
+            }
         }
 
         // Add these functions for recent searches
@@ -872,7 +949,7 @@
             const localGifs = JSON.parse(localStorage.getItem('localGifs') || '[]');
             
             if (favorites.length === 0 && localGifs.length === 0) {
-                myGifsGrid.innerHTML = '<div class="empty-state">No GIFs yet! Click the ☆ on any GIF to favorite it, or paste a GIPHY URL.</div>';
+                myGifsGrid.innerHTML = '<div class="empty-state">No GIFs yet! Click the ❤️ on any GIF to favorite it, or paste a GIPHY URL.</div>';
                 return;
             }
 
@@ -1111,12 +1188,135 @@
             }
         }
 
-        // Add keyboard event listener for the URL input
-        document.getElementById('giphy-url-input').addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                addGiphyUrl();
+        // Function to load user's favorites
+        async function loadUserFavorites() {
+            const myFavoritesGrid = document.getElementById('my-favorites-grid');
+            myFavoritesGrid.style.display = 'grid';
+            myFavoritesGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+            myFavoritesGrid.style.gap = '12px';
+            myFavoritesGrid.style.padding = '8px';
+            
+            // Get favorite GIFs
+            const favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
+            const favoriteData = JSON.parse(localStorage.getItem('userFavoriteGifsData') || '{}');
+            
+            if (favorites.length === 0) {
+                myFavoritesGrid.innerHTML = '<div class="empty-state">No favorites yet! Click the ❤️ on any GIF to favorite it, or paste a GIPHY URL.</div>';
+                return;
             }
-        });
+
+            // Process all favorites
+            const gifElements = favorites.map(id => {
+                const gif = favoriteData[id];
+                return `
+                    <div class="gif-item" data-gif-id="${id}">
+                        <button class="favorite-btn active" onclick="toggleFavorite(event, '${id}', '${gif.url}', '${gif.title}')">❤️</button>
+                        <img src="${gif.url}" 
+                             alt="${gif.title}" 
+                             loading="lazy" 
+                             onclick="copyToClipboard('https://media.giphy.com/media/${id}/giphy.gif', event)">
+                        <div class="copy-tooltip">Copied! 📋</div>
+                    </div>
+                `;
+            });
+
+            myFavoritesGrid.innerHTML = gifElements.join('');
+
+            // Add click handlers
+            document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
+                div.setAttribute('data-handler', 'true');
+                const tooltip = div.querySelector('.copy-tooltip');
+                
+                div.querySelector('img').addEventListener('click', () => {
+                    tooltip.classList.add('show');
+                    div.style.outline = '2px solid var(--primary-color)';
+                    
+                    setTimeout(() => {
+                        tooltip.classList.remove('show');
+                        div.style.outline = 'none';
+                    }, 1000);
+                });
+            });
+        }
+
+        async function addFavoriteUrl() {
+            const input = document.getElementById('favorite-url-input');
+            const url = input.value.trim();
+            
+            if (!url) {
+                alert('Please enter a GIPHY URL or ID');
+                return;
+            }
+
+            // Use the same logic as addGiphyUrl but with different UI elements
+            if (url.match(/^https:\/\/media\.giphy\.com\/media\/.*\/giphy\.gif$/)) {
+                try {
+                    const favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
+                    const favoriteData = JSON.parse(localStorage.getItem('userFavoriteGifsData') || '{}');
+                    const gifId = url.split('/').slice(-2)[0];
+
+                    if (!favorites.includes(gifId)) {
+                        favorites.push(gifId);
+                        favoriteData[gifId] = {
+                            url: url,
+                            title: 'GIPHY GIF',
+                            timestamp: Date.now()
+                        };
+
+                        localStorage.setItem('userFavoriteGifs', JSON.stringify(favorites));
+                        localStorage.setItem('userFavoriteGifsData', JSON.stringify(favoriteData));
+                    }
+
+                    // Clear input and reload favorites
+                    input.value = '';
+                    loadUserFavorites();
+                    return;
+                } catch (error) {
+                    console.error('Error adding direct URL:', error);
+                }
+            }
+
+            const gifId = extractGiphyId(url);
+            if (!gifId) {
+                alert('Invalid GIPHY URL or ID. Please make sure you\'re using a valid GIPHY URL.');
+                return;
+            }
+
+            try {
+                const apiUrl = `https://api.giphy.com/v1/gifs/${gifId}?api_key=${API_KEY}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (!data.data) {
+                    alert('GIF not found. Please check the URL or ID.');
+                    return;
+                }
+
+                const gif = data.data;
+                const favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
+                const favoriteData = JSON.parse(localStorage.getItem('userFavoriteGifsData') || '{}');
+
+                if (!favorites.includes(gif.id)) {
+                    favorites.push(gif.id);
+                    favoriteData[gif.id] = {
+                        url: gif.images.fixed_height.url,
+                        title: gif.title || 'Untitled GIF',
+                        timestamp: Date.now()
+                    };
+
+                    localStorage.setItem('userFavoriteGifs', JSON.stringify(favorites));
+                    localStorage.setItem('userFavoriteGifsData', JSON.stringify(favoriteData));
+                }
+
+                // Clear input and reload favorites
+                input.value = '';
+                loadUserFavorites();
+
+            } catch (error) {
+                console.error('Error adding favorite:', error);
+                alert('Failed to add GIF. Please try again.');
+            }
+        }
     </script>
 </body>
 </html> 
