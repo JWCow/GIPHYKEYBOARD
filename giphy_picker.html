@@ -392,10 +392,12 @@
             display: flex;
             gap: 8px;
             margin-bottom: 8px;
+            flex-wrap: wrap;
         }
 
         .url-input {
             flex: 1;
+            min-width: 200px;
             padding: 12px 16px;
             font-size: 16px;
             border: 2px solid transparent;
@@ -412,6 +414,7 @@
         }
 
         .add-url-btn {
+            flex: 0 0 auto;
             background: var(--primary-color);
             color: var(--bg-dark);
             padding: 12px 24px;
@@ -421,6 +424,7 @@
             font-weight: 500;
             transition: var(--transition);
             white-space: nowrap;
+            min-width: fit-content;
         }
 
         .add-url-btn:hover {
