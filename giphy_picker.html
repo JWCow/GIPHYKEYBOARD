@@ -546,7 +546,7 @@
                 <div class="giphy-url-input">
                     <input type="text" id="giphy-url-input" class="url-input" placeholder="Paste GIPHY URL" />
                     <button id="add-url-btn" class="add-url-btn">Add to My GIFs</button>
-                    <button id="export-gifs-btn" class="add-url-btn" onclick="exportGifs()">📥 Export GIFs</button>
+                    <button id="export-gifs-btn" class="add-url-btn" onclick="exportGifs('gifs')">📥 Export GIFs</button>
                 </div>
             </div>
             <div id="my-gifs-grid"></div>
@@ -557,6 +557,7 @@
                 <div class="giphy-url-input">
                     <input type="text" id="favorite-url-input" class="url-input" placeholder="Paste GIPHY URL" />
                     <button id="add-favorite-btn" class="add-url-btn">Add to My Favorites</button>
+                    <button id="export-favorites-btn" class="add-url-btn" onclick="exportGifs('favorites')">📥 Export Favorites</button>
                 </div>
             </div>
             <div id="my-favorites-grid"></div>
@@ -1320,34 +1321,49 @@
         }
 
         // Function to export GIFs
-        function exportGifs() {
-            const localGifs = JSON.parse(localStorage.getItem('localGifs') || '[]');
-            const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
-            const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
-
-            if (localGifs.length === 0 && favorites.length === 0) {
-                alert('No GIFs to export!');
-                return;
-            }
-
+        function exportGifs(type = 'gifs') {
             let content = '';
 
-            // Add local GIFs
-            if (localGifs.length > 0) {
-                content += '=== My GIFs ===\n\n';
-                localGifs.forEach(gif => {
-                    content += `Title: ${gif.title || 'Untitled'}\nURL: ${gif.url}\n-------------------\n`;
-                });
-            }
+            if (type === 'gifs') {
+                const localGifs = JSON.parse(localStorage.getItem('localGifs') || '[]');
+                const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+                const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
 
-            // Add favorites
-            if (favorites.length > 0) {
-                if (content) content += '\n';
-                content += '=== Favorites ===\n\n';
+                if (localGifs.length === 0 && favorites.length === 0) {
+                    alert('No GIFs to export!');
+                    return;
+                }
+
+                // Add local GIFs
+                if (localGifs.length > 0) {
+                    localGifs.forEach(gif => {
+                        content += `${gif.url}\n`;
+                    });
+                }
+
+                // Add favorites
+                if (favorites.length > 0) {
+                    favorites.forEach(id => {
+                        const gif = favoriteData[id];
+                        if (gif) {
+                            content += `${gif.url}\n`;
+                        }
+                    });
+                }
+            } else if (type === 'favorites') {
+                const favorites = JSON.parse(localStorage.getItem('userFavoriteGifs') || '[]');
+                const favoriteData = JSON.parse(localStorage.getItem('userFavoriteGifsData') || '{}');
+
+                if (favorites.length === 0) {
+                    alert('No favorites to export!');
+                    return;
+                }
+
+                // Add favorites
                 favorites.forEach(id => {
                     const gif = favoriteData[id];
                     if (gif) {
-                        content += `Title: ${gif.title || 'Untitled'}\nURL: ${gif.url}\n-------------------\n`;
+                        content += `${gif.url}\n`;
                     }
                 });
             }
@@ -1357,20 +1373,24 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'my_gifs_export.txt';
+            a.download = type === 'gifs' ? 'my_gifs_export.txt' : 'my_favorites_export.txt';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         }
 
-        // Add export button to My GIFs container
-        const exportButton = document.createElement('button');
-        exportButton.textContent = '📥 Export GIFs';
-        exportButton.className = 'add-url-btn';
-        exportButton.style.marginLeft = '8px';
-        document.querySelector('#my-gifs-container .giphy-url-input').appendChild(exportButton);
-        exportButton.addEventListener('click', exportGifs);
+        // Update My Favorites container HTML
+        document.getElementById('my-favorites-container').innerHTML = `
+            <div class="upload-section">
+                <div class="giphy-url-input">
+                    <input type="text" id="favorite-url-input" class="url-input" placeholder="Paste GIPHY URL" />
+                    <button id="add-favorite-btn" class="add-url-btn">Add to My Favorites</button>
+                    <button id="export-favorites-btn" class="add-url-btn" onclick="exportGifs('favorites')">📥 Export Favorites</button>
+                </div>
+            </div>
+            <div id="my-favorites-grid"></div>
+        `;
 
         // Update My GIFs container HTML
         document.getElementById('my-gifs-container').innerHTML = `
@@ -1378,7 +1398,7 @@
                 <div class="giphy-url-input">
                     <input type="text" id="giphy-url-input" class="url-input" placeholder="Paste GIPHY URL" />
                     <button id="add-url-btn" class="add-url-btn">Add to My GIFs</button>
-                    <button id="export-gifs-btn" class="add-url-btn" onclick="exportGifs()">📥 Export GIFs</button>
+                    <button id="export-gifs-btn" class="add-url-btn" onclick="exportGifs('gifs')">📥 Export GIFs</button>
                 </div>
             </div>
             <div id="my-gifs-grid"></div>
