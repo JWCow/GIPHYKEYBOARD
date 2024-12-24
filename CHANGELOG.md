@@ -1,13 +1,5 @@
 # Changelog
 
-## [1.0.5] - 2023-12-24
-### Changed
-- Improved grid layout for better space utilization
-- Enhanced GIF display with dynamic sizing
-- Optimized grid flow for more compact layout
-- Removed fixed aspect ratios for better GIF presentation
-- Improved scrolling behavior in all sections
-
 ## [1.0.4] - 2023-12-24
 ### Added
 - Custom GIPHY URL support in My GIFs tab
