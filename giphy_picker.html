@@ -153,32 +153,13 @@
             width: 100%;
             background: var(--bg-darker);
             box-shadow: var(--shadow);
-            break-inside: avoid;
-            page-break-inside: avoid;
-            display: flex;
-            flex-direction: column;
         }
 
-        .gif-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: var(--transition);
-            object-fit: cover;
-            flex: 1;
-        }
-
-        .gif-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 2;
-        }
-
-        .favorite-btn, .delete-gif {
+        .favorite-btn {
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             border: none;
             border-radius: 50%;
             width: 32px;
@@ -190,42 +171,32 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            z-index: 3;
-            backdrop-filter: blur(4px);
+            z-index: 2;
         }
 
-        .delete-gif {
-            right: auto;
-            left: 8px;
-            background: rgba(255, 0, 0, 0.6);
-            color: white;
-        }
-
-        .favorite-btn:hover, .delete-gif:hover {
+        .favorite-btn:hover {
             transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
         }
 
-        .delete-gif:hover {
-            background: rgba(255, 0, 0, 0.8);
+        .favorite-btn.active {
+            color: var(--primary-color);
         }
 
-        .copy-tooltip {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--primary-color);
-            color: var(--bg-dark);
-            padding: 8px 16px;
-            border-radius: var(--radius-lg);
-            font-weight: bold;
-            opacity: 0;
-            pointer-events: none;
+        .gif-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .gif-item img {
+            width: 100%;
+            height: auto;
+            display: block;
             transition: var(--transition);
-            z-index: 4;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(4px);
+        }
+
+        .gif-item:hover img {
+            filter: brightness(1.1);
         }
 
         .tabs {
@@ -354,23 +325,19 @@
         }
 
         #my-gifs-container {
-            display: flex;
+            display: none;
             flex-direction: column;
             flex: 1;
             overflow: hidden;
-            padding: 16px;
-            gap: 0;
+            padding: 20px;
         }
 
         .upload-section {
-            margin: 0 0 16px 0;
+            margin: 20px 0;
+            text-align: center;
             padding: 16px;
             background: var(--bg-light);
             border-radius: var(--radius-md);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            backdrop-filter: blur(8px);
         }
 
         .upload-button {
@@ -434,32 +401,33 @@
         .url-input {
             flex: 1;
             min-width: 200px;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: 2px solid transparent;
+            padding: 8px 12px;
+            border: none;
             border-radius: var(--radius-md);
             background: var(--bg-darker);
             color: var(--text-primary);
+            font-size: 14px;
             outline: none;
             transition: var(--transition);
         }
 
-        .url-input:focus {
-            border-color: var(--primary-color);
-            background: var(--bg-darker);
+        .url-input::placeholder {
+            color: var(--text-secondary);
+            font-size: 13px;
         }
 
         .add-url-btn {
-            flex: 0 0 auto;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-md);
             background: var(--primary-color);
             color: var(--bg-dark);
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            border: none;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 500;
             transition: var(--transition);
             white-space: nowrap;
+            flex: 0 0 auto;
             min-width: fit-content;
         }
 
@@ -476,7 +444,7 @@
 
         #my-gifs-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             overflow-y: auto;
             padding: 8px;
@@ -485,19 +453,6 @@
             max-height: calc(100vh - 250px);
             flex: 1;
             grid-auto-flow: dense;
-            align-items: start;
-        }
-
-        @media (min-width: 768px) {
-            #my-gifs-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (min-width: 1200px) {
-            #my-gifs-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            }
         }
     </style>
 </head>
@@ -547,14 +502,11 @@
         <div id="my-gifs-container">
             <div class="upload-section">
                 <div class="giphy-url-input">
-                    <input type="text" id="giphy-url" placeholder="Paste custom GIPHY URL here..." class="url-input">
-                    <button onclick="addGiphyUrl()" class="add-url-btn">Add to My GIFs</button>
+                    <input type="text" id="giphy-url-input" class="url-input" placeholder="Paste GIPHY URL" />
+                    <button id="add-url-btn" class="add-url-btn">Add to My GIFs</button>
                 </div>
-                <div class="url-hint">Example: https://media.giphy.com/media/custom_gif/giphy.gif</div>
             </div>
-            <div id="my-gifs-grid" style="display: grid;">
-                <!-- User's GIFs will be loaded here -->
-            </div>
+            <div id="my-gifs-grid"></div>
         </div>
 
         <div id="results">
@@ -1020,7 +972,7 @@
         }
 
         async function addGiphyUrl() {
-            const input = document.getElementById('giphy-url');
+            const input = document.getElementById('giphy-url-input');
             const url = input.value.trim();
             
             if (!url) {
@@ -1152,7 +1104,7 @@
         }
 
         // Add keyboard event listener for the URL input
-        document.getElementById('giphy-url').addEventListener('keypress', (event) => {
+        document.getElementById('giphy-url-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 addGiphyUrl();
             }
