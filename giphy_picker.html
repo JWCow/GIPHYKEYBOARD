@@ -328,6 +328,111 @@
             text-align: center;
             padding: 20px;
         }
+
+        .upload-section {
+            margin: 20px 0;
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+        }
+
+        .upload-button {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-button input[type="file"] {
+            display: none;
+        }
+
+        .local-gif {
+            position: relative;
+        }
+
+        .delete-gif {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .delete-gif:hover {
+            transform: scale(1.1);
+            background: rgba(255, 0, 0, 0.9);
+        }
+
+        .giphy-url-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            background: var(--bg-darker);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .url-input:focus {
+            border-color: var(--primary-color);
+            background: var(--bg-darker);
+        }
+
+        .add-url-btn {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .add-url-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .url-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -374,10 +479,14 @@
         </div>
 
         <div id="my-gifs-container">
-            <button class="giphy-login-btn" onclick="loginWithGiphy()">
-                Login with GIPHY
-            </button>
-            <div id="my-gifs-grid" style="display: none;">
+            <div class="upload-section">
+                <div class="giphy-url-input">
+                    <input type="text" id="giphy-url" placeholder="Paste custom GIPHY URL here..." class="url-input">
+                    <button onclick="addGiphyUrl()" class="add-url-btn">Add to My GIFs</button>
+                </div>
+                <div class="url-hint">Example: https://media.giphy.com/media/custom_gif/giphy.gif</div>
+            </div>
+            <div id="my-gifs-grid" style="display: grid;">
                 <!-- User's GIFs will be loaded here -->
             </div>
         </div>
@@ -598,7 +707,25 @@
         }
 
         function copyToClipboard(text, event) {
-            event.stopPropagation();
+            if (event) {
+                event.stopPropagation();
+            }
+
+            // If it's a data URL (local GIF), show an error message
+            if (text.startsWith('data:')) {
+                alert('Local GIFs cannot be shared directly. Please upload the GIF to GIPHY first.');
+                return;
+            }
+
+            // If it's a GIPHY URL, ensure it's in the correct format
+            if (text.includes('giphy.com')) {
+                // Extract the GIF ID from the URL
+                const matches = text.match(/media\/([^/]+)\/giphy\.gif/);
+                if (matches && matches[1]) {
+                    text = `https://media.giphy.com/media/${matches[1]}/giphy.gif`;
+                }
+            }
+
             const textarea = document.createElement('textarea');
             textarea.value = text;
             document.body.appendChild(textarea);
@@ -624,7 +751,8 @@
                 favorites.push(gifId);
                 favoriteData[gifId] = {
                     url: gifUrl,
-                    title: gifTitle
+                    title: gifTitle,
+                    timestamp: Date.now()
                 };
                 btn.textContent = '⭐';
                 btn.classList.add('active');
@@ -705,30 +833,263 @@
         // Function to load user's GIFs
         async function loadUserGifs() {
             const myGifsGrid = document.getElementById('my-gifs-grid');
-            const loginBtn = document.querySelector('.giphy-login-btn');
+            myGifsGrid.style.display = 'grid';
+            myGifsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+            myGifsGrid.style.gap = '12px';
+            myGifsGrid.style.padding = '8px';
             
+            // Get favorite GIFs
             const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
             const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
             
-            if (favorites.length === 0) {
-                myGifsGrid.innerHTML = '<div class="empty-state">No favorite GIFs yet! Click the ☆ on any GIF to add it to your favorites.</div>';
+            // Get local GIFs
+            const localGifs = JSON.parse(localStorage.getItem('localGifs') || '[]');
+            
+            if (favorites.length === 0 && localGifs.length === 0) {
+                myGifsGrid.innerHTML = '<div class="empty-state">No GIFs yet! Click the ☆ on any GIF to favorite it, or upload your own GIFs.</div>';
                 return;
             }
 
-            const gifs = favorites.map(id => ({
-                id: id,
-                images: {
-                    fixed_height: {
-                        url: favoriteData[id].url
-                    }
-                },
-                title: favoriteData[id].title
-            }));
+            // Combine favorite and local GIFs
+            const allGifs = [
+                ...localGifs.map(gif => ({
+                    ...gif,
+                    isLocal: true
+                })),
+                ...favorites.map(id => ({
+                    id: id,
+                    url: favoriteData[id].url,
+                    title: favoriteData[id].title,
+                    timestamp: favoriteData[id].timestamp,
+                    isLocal: false
+                }))
+            ];
 
-            loginBtn.style.display = 'none';
-            myGifsGrid.style.display = 'grid';
-            appendResults(gifs, myGifsGrid);
+            // Sort by newest first
+            allGifs.sort((a, b) => b.timestamp - a.timestamp);
+
+            myGifsGrid.innerHTML = allGifs
+                .map(gif => `
+                    <div class="gif-item ${gif.isLocal ? 'local-gif' : ''}" data-gif-id="${gif.id}">
+                        ${gif.isLocal ? 
+                            `<button class="delete-gif" onclick="deleteLocalGif('${gif.id}', event)">×</button>` :
+                            `<button class="favorite-btn active" onclick="toggleFavorite(event, '${gif.id}', '${gif.url}', '${gif.title}')">⭐</button>`
+                        }
+                        <img src="${gif.url}" 
+                             alt="${gif.title}" 
+                             loading="lazy" 
+                             onclick="copyToClipboard('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">
+                        <div class="copy-tooltip">Copied! 📋</div>
+                    </div>
+                `)
+                .join('');
+
+            // Add click handlers
+            document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
+                div.setAttribute('data-handler', 'true');
+                const tooltip = div.querySelector('.copy-tooltip');
+                
+                div.querySelector('img').addEventListener('click', () => {
+                    tooltip.classList.add('show');
+                    div.style.outline = '2px solid var(--primary-color)';
+                    
+                    setTimeout(() => {
+                        tooltip.classList.remove('show');
+                        div.style.outline = 'none';
+                    }, 1000);
+                });
+            });
         }
+
+        function extractGiphyId(url) {
+            // Clean up the URL first
+            url = url.trim();
+            
+            // Log the URL being processed
+            console.log('Processing URL:', url);
+
+            // First, try to find a clean GIPHY ID pattern
+            const cleanPatterns = [
+                /media\/([a-zA-Z0-9]+)\/giphy\.gif$/i,  // Clean media URL
+                /\/([a-zA-Z0-9]+)\/giphy\.gif/i,        // Alternative clean URL
+                /^[a-zA-Z0-9]{13,}$/i                   // Direct ID
+            ];
+
+            for (const pattern of cleanPatterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    console.log('Found clean ID:', match[1]);
+                    return match[1];
+                }
+            }
+
+            // If no clean match, try to extract from more complex URLs
+            const complexPatterns = [
+                /media\/([a-zA-Z0-9]+)\/giphy/i,        // Media URL with parameters
+                /gifs\/([a-zA-Z0-9-]+)/i,               // Web URL
+                /giphy\.com\/media\/([a-zA-Z0-9-]+)/i,  // Alternative media URL
+                /i\.giphy\.com\/([a-zA-Z0-9]+)/i        // i.giphy.com URL
+            ];
+
+            for (const pattern of complexPatterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    // Clean up the ID by removing any additional parameters or dashes
+                    const cleanId = match[1].split('-').pop().split('?')[0];
+                    console.log('Found complex ID:', cleanId);
+                    return cleanId;
+                }
+            }
+
+            // Try to find any 13+ character alphanumeric sequence that might be a GIPHY ID
+            const idMatch = url.match(/[a-zA-Z0-9]{13,}/i);
+            if (idMatch) {
+                console.log('Found ID in string:', idMatch[0]);
+                return idMatch[0];
+            }
+
+            console.log('No valid GIPHY ID found in URL');
+            return null;
+        }
+
+        async function addGiphyUrl() {
+            const input = document.getElementById('giphy-url');
+            const url = input.value.trim();
+            
+            if (!url) {
+                alert('Please enter a GIPHY URL or ID');
+                return;
+            }
+
+            // If it's already a complete GIPHY URL, just use it directly
+            if (url.match(/^https:\/\/media\.giphy\.com\/media\/.*\/giphy\.gif$/)) {
+                try {
+                    const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+                    const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+                    const gifId = url.split('/').slice(-2)[0];
+
+                    if (!favorites.includes(gifId)) {
+                        favorites.push(gifId);
+                        favoriteData[gifId] = {
+                            url: url,
+                            title: 'GIPHY GIF',
+                            timestamp: Date.now()
+                        };
+
+                        localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
+                        localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
+                    }
+
+                    // Clear input and reload GIFs
+                    input.value = '';
+                    loadUserGifs();
+                    return;
+                } catch (error) {
+                    console.error('Error adding direct URL:', error);
+                }
+            }
+
+            const gifId = extractGiphyId(url);
+            console.log('Extracted GIF ID:', gifId);
+
+            if (!gifId) {
+                alert('Invalid GIPHY URL or ID. Please make sure you\'re using a valid GIPHY URL.');
+                return;
+            }
+
+            try {
+                // Try to fetch GIF data from GIPHY API
+                const apiUrl = `https://api.giphy.com/v1/gifs/${gifId}?api_key=${API_KEY}`;
+                console.log('Fetching from API:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                if (!data.data) {
+                    // If API fails, but we have a valid URL, use it directly
+                    if (url.includes('giphy.com') && url.includes('.gif')) {
+                        const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+                        const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+
+                        if (!favorites.includes(gifId)) {
+                            favorites.push(gifId);
+                            favoriteData[gifId] = {
+                                url: url,
+                                title: 'GIPHY GIF',
+                                timestamp: Date.now()
+                            };
+
+                            localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
+                            localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
+                        }
+
+                        // Clear input and reload GIFs
+                        input.value = '';
+                        loadUserGifs();
+                        return;
+                    }
+
+                    alert('GIF not found. Please check the URL or ID.');
+                    return;
+                }
+
+                const gif = data.data;
+                const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+                const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+
+                if (!favorites.includes(gif.id)) {
+                    favorites.push(gif.id);
+                    favoriteData[gif.id] = {
+                        url: gif.images.fixed_height.url,
+                        title: gif.title || 'Untitled GIF',
+                        timestamp: Date.now()
+                    };
+
+                    localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
+                    localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
+                }
+
+                // Clear input and reload GIFs
+                input.value = '';
+                loadUserGifs();
+
+            } catch (error) {
+                console.error('Error adding GIF:', error);
+                
+                // If API fails but we have a valid URL, try to add it directly
+                if (url.includes('giphy.com') && url.includes('.gif')) {
+                    const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+                    const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+
+                    if (!favorites.includes(gifId)) {
+                        favorites.push(gifId);
+                        favoriteData[gifId] = {
+                            url: url,
+                            title: 'GIPHY GIF',
+                            timestamp: Date.now()
+                        };
+
+                        localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
+                        localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
+                        
+                        // Clear input and reload GIFs
+                        input.value = '';
+                        loadUserGifs();
+                        return;
+                    }
+                }
+                
+                alert('Failed to add GIF. Please try again.');
+            }
+        }
+
+        // Add keyboard event listener for the URL input
+        document.getElementById('giphy-url').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                addGiphyUrl();
+            }
+        });
     </script>
 </body>
 </html> 
