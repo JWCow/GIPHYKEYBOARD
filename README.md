@@ -11,16 +11,22 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="33%">
 
-### 🔍 Search Interface
+### 🔍 Search
 ![Search Interface](screenshots/search.png)
 
 </td>
-<td width="50%">
+<td width="33%">
 
-### 💡 GIF Ideas
+### 💡 Ideas
 ![GIF Ideas](screenshots/ideas.png)
+
+</td>
+<td width="33%">
+
+### ⭐ Favorites
+![My Favorites](screenshots/favorites.png)
 
 </td>
 </tr>
