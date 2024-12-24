@@ -157,27 +157,33 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            background: var(--bg-darker);
+            background: rgba(0, 0, 0, 0.5);
             border: none;
             border-radius: 50%;
             width: 32px;
             height: 32px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            opacity: 0;
             transition: var(--transition);
             z-index: 2;
         }
 
-        .gif-item:hover .favorite-btn {
-            opacity: 1;
+        .favorite-btn:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .favorite-btn.active {
-            opacity: 1;
-            background: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .gif-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         .gif-item img {
@@ -368,8 +374,11 @@
         </div>
 
         <div id="my-gifs-container">
-            <div id="my-gifs-grid">
-                <!-- Saved GIFs will be loaded here -->
+            <button class="giphy-login-btn" onclick="loginWithGiphy()">
+                Login with GIPHY
+            </button>
+            <div id="my-gifs-grid" style="display: none;">
+                <!-- User's GIFs will be loaded here -->
             </div>
         </div>
 
@@ -442,7 +451,8 @@
                     loadTrendingCategories();
                 } else if (tab.dataset.tab === 'my-gifs') {
                     document.getElementById('my-gifs-container').style.display = 'block';
-                    loadSavedGifs();
+                    document.getElementById('my-gifs-grid').style.display = 'grid';
+                    loadUserGifs();
                 } else {
                     searchInput.parentElement.style.display = 'block';
                     resultsDiv.style.display = 'grid';
@@ -476,17 +486,22 @@
                 container.innerHTML = '';
             }
 
-            const savedGifs = JSON.parse(localStorage.getItem('savedGifs') || '[]');
+            // Get favorites from local storage
+            const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
 
             const newGifs = gifs
                 .map(gif => {
-                    const isSaved = savedGifs.some(saved => saved.id === gif.id);
+                    const isFavorite = favorites.includes(gif.id);
                     return `
                         <div class="gif-item" data-gif-id="${gif.id}">
-                            <img src="${gif.images.fixed_height.url}" alt="${gif.title}" loading="lazy">
-                            <button class="favorite-btn ${isSaved ? 'active' : ''}" onclick="toggleFavorite(event, ${JSON.stringify(gif)})">
-                                ${isSaved ? '⭐' : '☆'}
+                            <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
+                                    onclick="toggleFavorite(event, '${gif.id}', '${gif.images.fixed_height.url}', '${gif.title.replace(/'/g, "\\'")}')">
+                                ${isFavorite ? '⭐' : '☆'}
                             </button>
+                            <img src="${gif.images.fixed_height.url}" 
+                                 alt="${gif.title}" 
+                                 loading="lazy" 
+                                 onclick="copyToClipboard('https://media.giphy.com/media/${gif.id}/giphy.gif', event)">
                             <div class="copy-tooltip">Copied! 📋</div>
                         </div>
                     `;
@@ -497,12 +512,9 @@
 
             document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
                 div.setAttribute('data-handler', 'true');
-                div.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('favorite-btn')) return;
-                    
-                    const gifId = div.dataset.gifId;
-                    const tooltip = div.querySelector('.copy-tooltip');
-                    copyToClipboard(`https://media.giphy.com/media/${gifId}/giphy.gif`);
+                const tooltip = div.querySelector('.copy-tooltip');
+                
+                div.querySelector('img').addEventListener('click', () => {
                     tooltip.classList.add('show');
                     div.style.outline = '2px solid var(--primary-color)';
                     
@@ -512,41 +524,6 @@
                     }, 1000);
                 });
             });
-        }
-
-        function toggleFavorite(event, gif) {
-            event.stopPropagation();
-            const btn = event.target;
-            const savedGifs = JSON.parse(localStorage.getItem('savedGifs') || '[]');
-            const index = savedGifs.findIndex(saved => saved.id === gif.id);
-
-            if (index === -1) {
-                savedGifs.unshift(gif);
-                btn.textContent = '⭐';
-                btn.classList.add('active');
-            } else {
-                savedGifs.splice(index, 1);
-                btn.textContent = '☆';
-                btn.classList.remove('active');
-            }
-
-            localStorage.setItem('savedGifs', JSON.stringify(savedGifs));
-            
-            // If we're in My GIFs tab, refresh the display
-            if (document.querySelector('[data-tab="my-gifs"]').classList.contains('active')) {
-                loadSavedGifs();
-            }
-        }
-
-        function loadSavedGifs() {
-            const myGifsGrid = document.getElementById('my-gifs-grid');
-            const savedGifs = JSON.parse(localStorage.getItem('savedGifs') || '[]');
-
-            if (savedGifs.length === 0) {
-                myGifsGrid.innerHTML = '<div class="empty-state">No saved GIFs yet! Click ☆ on any GIF to save it.</div>';
-            } else {
-                appendResults(savedGifs, myGifsGrid);
-            }
         }
 
         async function searchGifs() {
@@ -620,13 +597,41 @@
             searchGifs();
         }
 
-        function copyToClipboard(text) {
+        function copyToClipboard(text, event) {
+            event.stopPropagation();
             const textarea = document.createElement('textarea');
             textarea.value = text;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
+        }
+
+        function toggleFavorite(event, gifId, gifUrl, gifTitle) {
+            event.stopPropagation();
+            const btn = event.target;
+            let favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+            let favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+            
+            if (favorites.includes(gifId)) {
+                // Remove from favorites
+                favorites = favorites.filter(id => id !== gifId);
+                delete favoriteData[gifId];
+                btn.textContent = '☆';
+                btn.classList.remove('active');
+            } else {
+                // Add to favorites
+                favorites.push(gifId);
+                favoriteData[gifId] = {
+                    url: gifUrl,
+                    title: gifTitle
+                };
+                btn.textContent = '⭐';
+                btn.classList.add('active');
+            }
+            
+            localStorage.setItem('favoriteGifs', JSON.stringify(favorites));
+            localStorage.setItem('favoriteGifsData', JSON.stringify(favoriteData));
         }
 
         // Add these functions for recent searches
@@ -661,6 +666,69 @@
 
         // Load recent searches on page load
         window.addEventListener('load', updateRecentSearches);
+
+        // Add these variables
+        let isAuthenticated = false;
+        let giphyAccessToken = localStorage.getItem('giphyAccessToken');
+
+        // Add GIPHY authentication function
+        async function loginWithGiphy() {
+            // GIPHY OAuth configuration
+            const clientId = 'your_giphy_client_id';
+            const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+            const giphyAuthUrl = `https://giphy.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}`;
+            
+            // Open GIPHY login in a popup
+            const width = 600;
+            const height = 700;
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+            
+            window.open(
+                giphyAuthUrl,
+                'Login with GIPHY',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+        }
+
+        // Handle GIPHY OAuth callback
+        window.addEventListener('message', async (event) => {
+            if (event.data.type === 'GIPHY_AUTH_SUCCESS') {
+                const { access_token } = event.data;
+                localStorage.setItem('giphyAccessToken', access_token);
+                giphyAccessToken = access_token;
+                isAuthenticated = true;
+                loadUserGifs();
+            }
+        });
+
+        // Function to load user's GIFs
+        async function loadUserGifs() {
+            const myGifsGrid = document.getElementById('my-gifs-grid');
+            const loginBtn = document.querySelector('.giphy-login-btn');
+            
+            const favorites = JSON.parse(localStorage.getItem('favoriteGifs') || '[]');
+            const favoriteData = JSON.parse(localStorage.getItem('favoriteGifsData') || '{}');
+            
+            if (favorites.length === 0) {
+                myGifsGrid.innerHTML = '<div class="empty-state">No favorite GIFs yet! Click the ☆ on any GIF to add it to your favorites.</div>';
+                return;
+            }
+
+            const gifs = favorites.map(id => ({
+                id: id,
+                images: {
+                    fixed_height: {
+                        url: favoriteData[id].url
+                    }
+                },
+                title: favoriteData[id].title
+            }));
+
+            loginBtn.style.display = 'none';
+            myGifsGrid.style.display = 'grid';
+            appendResults(gifs, myGifsGrid);
+        }
     </script>
 </body>
 </html> 
