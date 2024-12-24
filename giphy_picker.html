@@ -160,6 +160,130 @@
             height: 200px;
         }
 
+        .hover-buttons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .gif-item:hover .hover-buttons {
+            opacity: 1;
+        }
+
+        .hover-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            backdrop-filter: blur(2px);
+        }
+
+        .hover-button:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--primary-color);
+        }
+
+        .action-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
+            z-index: 3;
+        }
+
+        .action-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .action-message {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            font-weight: bold;
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .action-overlay.show .action-message {
+            transform: scale(1);
+        }
+
+        .water-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .water-wave.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(to top, var(--primary-color) 0%, transparent 100%);
+            transform: translateY(100%);
+            animation: waveRise 1s ease-in-out infinite;
+        }
+
+        @keyframes waveRise {
+            0% {
+                transform: translateY(100%);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(0%);
+                opacity: 0.3;
+            }
+        }
+
         .favorite-btn {
             position: absolute;
             top: 8px;
@@ -747,9 +871,14 @@
                             </button>
                             <img src="${gif.images.fixed_height.url}" 
                                  alt="${gif.title}" 
-                                 loading="lazy" 
-                                 onclick="copyToClipboard('https://media.giphy.com/media/${gif.id}/giphy.gif', event)">
-                            <div class="copy-tooltip">Copied! 📋</div>
+                                 loading="lazy">
+                            <div class="hover-buttons">
+                                <button class="hover-button" onclick="copyToClipboard('https://media.giphy.com/media/${gif.id}/giphy.gif', event)">📋</button>
+                                <button class="hover-button" onclick="downloadGif('https://media.giphy.com/media/${gif.id}/giphy.gif', event)">💾</button>
+                            </div>
+                            <div class="action-overlay">
+                                <div class="action-message"></div>
+                            </div>
                         </div>
                     `;
                 })
@@ -759,16 +888,9 @@
 
             document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
                 div.setAttribute('data-handler', 'true');
-                const tooltip = div.querySelector('.copy-tooltip');
                 
-                div.querySelector('img').addEventListener('click', () => {
-                    tooltip.classList.add('show');
-                    div.style.outline = '2px solid var(--primary-color)';
-                    
-                    setTimeout(() => {
-                        tooltip.classList.remove('show');
-                        div.style.outline = 'none';
-                    }, 1000);
+                div.querySelector('.hover-buttons').addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             });
         }
@@ -844,32 +966,154 @@
             searchGifs();
         }
 
-        function copyToClipboard(text, event) {
+        function showActionMessage(gifItem, message) {
+            const overlay = gifItem.querySelector('.action-overlay');
+            const messageEl = overlay.querySelector('.action-message');
+            messageEl.textContent = message;
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, 1000);
+        }
+
+        async function copyToClipboard(text, event) {
             if (event) {
                 event.stopPropagation();
             }
 
-            // If it's a data URL (local GIF), show an error message
-            if (text.startsWith('data:')) {
-                alert('Local GIFs cannot be shared directly. Please upload the GIF to GIPHY first.');
-                return;
+            const gifItem = event.target.closest('.gif-item');
+
+            try {
+                await navigator.clipboard.writeText(text);
+                showActionMessage(gifItem, 'Copied! 📋');
+            } catch (error) {
+                console.error('Error copying to clipboard:', error);
+                showActionMessage(gifItem, 'Copy failed 😢');
+            }
+        }
+
+        async function compressGif(blob, maxSizeMB = 2) {
+            const maxSizeBytes = maxSizeMB * 1024 * 1024;
+            
+            // If already under max size, return original
+            if (blob.size <= maxSizeBytes) {
+                return blob;
             }
 
-            // If it's a GIPHY URL, ensure it's in the correct format
-            if (text.includes('giphy.com')) {
-                // Extract the GIF ID from the URL
-                const matches = text.match(/media\/([^/]+)\/giphy\.gif/);
-                if (matches && matches[1]) {
-                    text = `https://media.giphy.com/media/${matches[1]}/giphy.gif`;
+            // Create an image element
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
+
+            await new Promise((resolve) => {
+                img.onload = resolve;
+            });
+
+            // Create a canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // For GIFs over maxSize, reduce by 50%
+            const scale = 0.5; // 50% of original size
+
+            let width = img.width * scale;
+            let height = img.height * scale;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw and capture frame
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to blob with reduced quality
+            const compressedBlob = await new Promise(resolve => {
+                canvas.toBlob(resolve, 'image/gif', 0.8);
+            });
+
+            // Clean up
+            URL.revokeObjectURL(img.src);
+            img.remove();
+            canvas.remove();
+
+            return compressedBlob;
+        }
+
+        async function downloadGif(url, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            const gifItem = event.target.closest('.gif-item');
+            const MAX_SIZE_MB = 2;
+
+            try {
+                showActionMessage(gifItem, 'Downloading GIF...');
+
+                // Try to fetch the GIF directly first
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch GIF');
+
+                const blob = await response.blob();
+                const originalSizeMB = blob.size / (1024 * 1024);
+
+                // For public GIFs, try to get a smaller version if needed
+                if (!url.includes('media.giphy.com/private') && originalSizeMB > MAX_SIZE_MB) {
+                    try {
+                        // Extract the GIF ID from the URL
+                        const gifId = url.split('/').slice(-2)[0];
+                        
+                        // Try to get the GIF info from GIPHY API
+                        const apiResponse = await fetch(`https://api.giphy.com/v1/gifs/${gifId}?api_key=${API_KEY}`);
+                        const gifData = await apiResponse.json();
+
+                        if (gifData.data) {
+                            showActionMessage(gifItem, 'Getting smaller version...');
+                            
+                            // Try downsized version first
+                            const downsizedUrl = gifData.data.images.downsized.url;
+                            const downsizedResponse = await fetch(downsizedUrl);
+                            const downsizedBlob = await downsizedResponse.blob();
+                            const downsizedSizeMB = downsizedBlob.size / (1024 * 1024);
+
+                            if (downsizedSizeMB < originalSizeMB) {
+                                // Use the smaller version
+                                const blobUrl = URL.createObjectURL(downsizedBlob);
+                                const link = document.createElement('a');
+                                link.href = blobUrl;
+                                link.download = 'temp.gif';
+                                link.setAttribute('download', 'temp.gif');
+                                
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                URL.revokeObjectURL(blobUrl);
+
+                                showActionMessage(gifItem, `Downloaded smaller version! (${downsizedSizeMB.toFixed(1)}MB) 💾`);
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Could not get smaller version, using original');
+                    }
                 }
-            }
 
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
+                // If we couldn't get a smaller version or it's a private GIF, use the original
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = 'temp.gif';
+                link.setAttribute('download', 'temp.gif');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+
+                showActionMessage(gifItem, `Downloaded! (${originalSizeMB.toFixed(1)}MB) 💾`);
+            } catch (error) {
+                console.error('Error downloading GIF:', error);
+                showActionMessage(gifItem, 'Download failed 😢');
+            }
         }
 
         function toggleFavorite(event, gifId, gifUrl, gifTitle) {
@@ -1048,9 +1292,14 @@
                     }
                     <img src="${gif.url}" 
                          alt="${gif.title}" 
-                         loading="lazy" 
-                         onclick="copyToClipboard('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">
-                    <div class="copy-tooltip">Copied! 📋</div>
+                         loading="lazy">
+                    <div class="hover-buttons">
+                        <button class="hover-button" onclick="copyToClipboard('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">📋</button>
+                        <button class="hover-button" onclick="downloadGif('${gif.isLocal ? gif.url : `https://media.giphy.com/media/${gif.id}/giphy.gif`}', event)">💾</button>
+                    </div>
+                    <div class="action-overlay">
+                        <div class="action-message"></div>
+                    </div>
                 </div>
             `);
 
@@ -1059,16 +1308,9 @@
             // Add click handlers
             document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
                 div.setAttribute('data-handler', 'true');
-                const tooltip = div.querySelector('.copy-tooltip');
                 
-                div.querySelector('img').addEventListener('click', () => {
-                    tooltip.classList.add('show');
-                    div.style.outline = '2px solid var(--primary-color)';
-                    
-                    setTimeout(() => {
-                        tooltip.classList.remove('show');
-                        div.style.outline = 'none';
-                    }, 1000);
+                div.querySelector('.hover-buttons').addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             });
         }
@@ -1300,9 +1542,14 @@
                         <button class="favorite-btn active" onclick="toggleFavorite(event, '${id}', '${gif.url}', '${gif.title}')">❤️</button>
                         <img src="${gif.url}" 
                              alt="${gif.title}" 
-                             loading="lazy" 
-                             onclick="copyToClipboard('https://media.giphy.com/media/${id}/giphy.gif', event)">
-                        <div class="copy-tooltip">Copied! 📋</div>
+                             loading="lazy">
+                        <div class="hover-buttons">
+                            <button class="hover-button" onclick="copyToClipboard('https://media.giphy.com/media/${id}/giphy.gif', event)">📋</button>
+                            <button class="hover-button" onclick="downloadGif('https://media.giphy.com/media/${id}/giphy.gif', event)">💾</button>
+                        </div>
+                        <div class="action-overlay">
+                            <div class="action-message"></div>
+                        </div>
                     </div>
                 `;
             });
@@ -1312,16 +1559,9 @@
             // Add click handlers
             document.querySelectorAll('.gif-item:not([data-handler])').forEach(div => {
                 div.setAttribute('data-handler', 'true');
-                const tooltip = div.querySelector('.copy-tooltip');
                 
-                div.querySelector('img').addEventListener('click', () => {
-                    tooltip.classList.add('show');
-                    div.style.outline = '2px solid var(--primary-color)';
-                    
-                    setTimeout(() => {
-                        tooltip.classList.remove('show');
-                        div.style.outline = 'none';
-                    }, 1000);
+                div.querySelector('.hover-buttons').addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             });
         }
