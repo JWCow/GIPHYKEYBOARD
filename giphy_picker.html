@@ -15,9 +15,9 @@
         :root {
             --primary-color: #00ff9d;
             --bg-dark: #121212;
-            --bg-darker: #0a0a0a;
+            --bg-darker: #2a2a2a;
             --bg-light: #2a2a2a;
-            --bg-lighter: #333;
+            --bg-lighter: #333333;
             --text-primary: #ffffff;
             --text-secondary: #888;
             --radius-sm: 8px;
@@ -25,6 +25,9 @@
             --radius-lg: 20px;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            --input-bg: #1a1a1a;
+            --search-input-bg: #1a1a1a;
+            --input-border: #404040;
         }
 
         body {
@@ -60,9 +63,9 @@
             width: 100%;
             padding: 12px 16px;
             font-size: 16px;
-            border: 2px solid transparent;
+            border: 1px solid var(--input-border);
             border-radius: var(--radius-md);
-            background: var(--bg-light);
+            background: var(--search-input-bg);
             color: var(--text-primary);
             outline: none;
             transition: var(--transition);
@@ -70,12 +73,12 @@
 
         #search-input:focus {
             border-color: var(--primary-color);
-            background: var(--bg-lighter);
+            background: var(--input-bg);
         }
 
         #ideas-container {
             margin-bottom: 16px;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.5s ease;
         }
 
         .ideas-section {
@@ -205,7 +208,7 @@
         .tabs {
             display: flex;
             margin-bottom: 16px;
-            background: var(--bg-light);
+            background: var(--bg-lighter);
             padding: 4px;
             border-radius: var(--radius-lg);
             gap: 4px;
@@ -220,16 +223,19 @@
             transition: var(--transition);
             text-align: center;
             font-weight: 500;
+            border: 1px solid transparent;
         }
 
         .tab:hover {
             color: var(--text-primary);
-            background: var(--bg-lighter);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
         }
 
         .tab.active {
             color: var(--bg-dark);
             background: var(--primary-color);
+            transform: translateY(-2px);
         }
 
         .copy-tooltip {
@@ -284,28 +290,54 @@
 
         .recent-searches {
             display: flex;
-            flex-wrap: wrap;
             gap: 8px;
-            padding: 8px 0;
+            padding: 8px;
             margin-bottom: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            -ms-overflow-style: none;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+        }
+
+        .recent-searches::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .recent-searches::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: var(--radius-sm);
+        }
+
+        .recent-searches::-webkit-scrollbar-thumb {
+            background: var(--bg-lighter);
+            border-radius: var(--radius-sm);
+        }
+
+        .recent-searches::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
         }
 
         .recent-search {
-            font-size: 12px;
-            padding: 4px 8px;
-            background: var(--bg-light);
-            border-radius: var(--radius-sm);
+            font-size: 13px;
+            padding: 6px 12px;
+            background: var(--bg-lighter);
+            border-radius: var(--radius-lg);
             cursor: pointer;
             transition: var(--transition);
             color: var(--text-secondary);
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            border: 1px solid transparent;
+            flex-shrink: 0;
         }
 
         .recent-search:hover {
-            background: var(--bg-lighter);
+            border-color: var(--primary-color);
             color: var(--text-primary);
+            transform: translateY(-2px);
         }
 
         /* Add styles for login button */
@@ -332,13 +364,13 @@
             flex-direction: column;
             flex: 1;
             overflow: hidden;
-            padding: 20px;
+            padding: 12px;
         }
 
         .upload-section {
-            margin: 20px 0;
+            margin: 0 0 8px 0;
             text-align: center;
-            padding: 16px;
+            padding: 12px;
             background: var(--bg-light);
             border-radius: var(--radius-md);
         }
@@ -405,13 +437,18 @@
             flex: 1;
             min-width: 200px;
             padding: 8px 12px;
-            border: none;
+            border: 1px solid var(--input-border);
             border-radius: var(--radius-md);
-            background: var(--bg-darker);
+            background: var(--input-bg);
             color: var(--text-primary);
             font-size: 14px;
             outline: none;
             transition: var(--transition);
+        }
+
+        .url-input:focus {
+            border-color: var(--primary-color);
+            background: var(--input-bg);
         }
 
         .url-input::placeholder {
@@ -463,7 +500,7 @@
             flex-direction: column;
             flex: 1;
             overflow: hidden;
-            padding: 20px;
+            padding: 12px;
         }
 
         #my-favorites-grid {
@@ -500,10 +537,10 @@
 <body>
     <div id="main-container">
         <div class="tabs">
-            <div class="tab active" data-tab="search">🔍 Search</div>
-            <div class="tab" data-tab="ideas">💡 GIF Ideas</div>
-            <div class="tab" data-tab="my-favorites">❤️ My Favorites</div>
-            <div class="tab" data-tab="my-gifs">⭐ My GIFs</div>
+            <div class="tab active" data-tab="search">🔍 Explore</div>
+            <div class="tab" data-tab="ideas">✨ Trending</div>
+            <div class="tab" data-tab="my-favorites">❤️ Favorites</div>
+            <div class="tab" data-tab="my-gifs">⭐ Collection</div>
         </div>
 
         <div id="search-container">
@@ -897,6 +934,9 @@
                     </div>
                 `)
                 .join('');
+            
+            // Only show the container if there are searches
+            recentSearchesDiv.style.display = searches.length ? 'flex' : 'none';
         }
 
         // Load recent searches on page load
