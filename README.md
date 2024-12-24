@@ -7,7 +7,7 @@
 [![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows)
 [![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)](https://www.autohotkey.com/)
 
-> 🚀 A lightning-fast GIPHY search tool that lives in your keyboard shortcuts. Find and share GIFs instantly without leaving your current window.
+> 🚀 A lightning-fast GIPHY search tool that lives in your keyboard shortcuts. Find, save, and share GIFs instantly without leaving your current window.
 
 <table>
 <tr>
@@ -15,18 +15,21 @@
 
 ### 🔍 Search
 ![Search Interface](screenshots/search.png)
+*Search millions of GIFs with instant results*
 
 </td>
 <td width="33%">
 
 ### 💡 Ideas
 ![GIF Ideas](screenshots/ideas.png)
+*Discover trending categories and reactions*
 
 </td>
 <td width="33%">
 
 ### ⭐ Favorites
 ![My Favorites](screenshots/favorites.png)
+*Save your favorite GIFs for quick access*
 
 </td>
 </tr>
@@ -36,7 +39,7 @@
 
 ## 📦 Latest Updates
 
-- **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support for adding any GIF to favorites
+- **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support and improved UI responsiveness
 - **[v1.0.3](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.3)** - Added favorite GIFs functionality with local storage
 - **[v1.0.2](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.2)** - Universal browser support and optimizations
 - **[v1.0.1](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.1)** - Added recent searches and keyboard shortcuts
@@ -50,10 +53,11 @@
 * 🔍 Fast GIF search with instant results
 * 💡 GIF Ideas tab with trending categories and popular reactions
 * 📋 Copy GIF URLs to clipboard with a single click
+* ⭐ Save and manage your favorite GIFs
+* 🔗 Add any GIPHY URL to your collection
 * 🌙 Clean, modern dark mode interface
 * ♾️ Infinite scroll loading
 * 🕒 Recent searches history
-* ⚡ Add any GIPHY URL to your favorites
 * ⚡ Optimized browser instance with minimal overhead
 * 🎨 Adaptive window positioning and sizing
 
@@ -72,7 +76,7 @@
 2. Double-click `giphy_hotkey.ahk` to run the program
 3. You should see the AutoHotkey icon in your system tray
 4. Press `Win + C` to open the GIPHY picker
-5. Type something to search for GIFs!
+5. Start searching for GIFs or browse trending categories!
 
 💡 **Pro Tips:**
 - To have the program start automatically with Windows:
@@ -85,10 +89,11 @@
 ## 🎮 Usage
 
 * Press `Win + C` to open/close the GIPHY picker
-* Type to search for GIFs
+* Type to search for GIFs instantly
 * Click on a GIF to copy its URL to clipboard
 * Use the "GIF Ideas" tab for inspiration
-* Press `Esc` to close the picker
+* Add GIFs to favorites by clicking the ⭐ button
+* Paste GIPHY URLs to add them to your collection
 * Use keyboard shortcuts:
   * ↑/↓: Scroll through results
   * Tab: Navigate between GIFs
@@ -100,7 +105,7 @@
 The app runs as a highly optimized browser instance with:
 * Zero browser extension overhead
 * Disabled unnecessary features (translate, sync, etc.)
-* Minimal memory footprint
+* Minimal memory footprint (~50MB)
 * Fast startup with preloading
 * Clean app-mode presentation
 * Automatic browser detection
@@ -113,6 +118,7 @@ The app runs as a highly optimized browser instance with:
 * The hotkey functionality is Windows-only (requires AutoHotkey)
 * The web interface itself is cross-platform compatible
 * Uses a dedicated user profile to avoid conflicts with your main browser
+* All favorites are stored locally in your browser
 
 ## 📜 License
 
