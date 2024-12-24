@@ -275,6 +275,31 @@
             background: var(--bg-lighter);
             color: var(--text-primary);
         }
+
+        /* Add styles for login button */
+        .giphy-login-btn {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            margin: 20px auto;
+            display: block;
+        }
+
+        .giphy-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #my-gifs-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -282,6 +307,7 @@
         <div class="tabs">
             <div class="tab active" data-tab="search">🔍 Search</div>
             <div class="tab" data-tab="ideas">💡 GIF Ideas</div>
+            <div class="tab" data-tab="my-gifs">⭐ My GIFs</div>
         </div>
 
         <div id="search-container">
@@ -316,6 +342,15 @@
                     <div class="idea-tag" onclick="searchFor('shrug')">🤷 Shrug</div>
                     <div class="idea-tag" onclick="searchFor('dance')">💃 Dance</div>
                 </div>
+            </div>
+        </div>
+
+        <div id="my-gifs-container">
+            <button class="giphy-login-btn" onclick="loginWithGiphy()">
+                Login with GIPHY
+            </button>
+            <div id="my-gifs-grid" style="display: none;">
+                <!-- User's GIFs will be loaded here -->
             </div>
         </div>
 
@@ -376,13 +411,19 @@
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
+                // Hide all containers
                 searchInput.parentElement.style.display = 'none';
                 ideasContainer.style.display = 'none';
+                document.getElementById('my-gifs-container').style.display = 'none';
                 resultsDiv.innerHTML = '';
 
+                // Show selected container
                 if (tab.dataset.tab === 'ideas') {
                     ideasContainer.style.display = 'block';
                     loadTrendingCategories();
+                } else if (tab.dataset.tab === 'my-gifs') {
+                    document.getElementById('my-gifs-container').style.display = 'block';
+                    if (isAuthenticated) loadUserGifs();
                 } else {
                     searchInput.parentElement.style.display = 'block';
                     resultsDiv.innerHTML = '<div class="empty-state">Type something to search for GIFs!</div>';
@@ -553,6 +594,75 @@
 
         // Load recent searches on page load
         window.addEventListener('load', updateRecentSearches);
+
+        // Add these variables
+        let isAuthenticated = false;
+        let giphyAccessToken = localStorage.getItem('giphyAccessToken');
+
+        // Add GIPHY authentication function
+        async function loginWithGiphy() {
+            // GIPHY OAuth configuration
+            const clientId = 'your_giphy_client_id';
+            const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+            const giphyAuthUrl = `https://giphy.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}`;
+            
+            // Open GIPHY login in a popup
+            const width = 600;
+            const height = 700;
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+            
+            window.open(
+                giphyAuthUrl,
+                'Login with GIPHY',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+        }
+
+        // Handle GIPHY OAuth callback
+        window.addEventListener('message', async (event) => {
+            if (event.data.type === 'GIPHY_AUTH_SUCCESS') {
+                const { access_token } = event.data;
+                localStorage.setItem('giphyAccessToken', access_token);
+                giphyAccessToken = access_token;
+                isAuthenticated = true;
+                loadUserGifs();
+            }
+        });
+
+        // Function to load user's GIFs
+        async function loadUserGifs() {
+            if (!isAuthenticated) return;
+            
+            const myGifsGrid = document.getElementById('my-gifs-grid');
+            const loginBtn = document.querySelector('.giphy-login-btn');
+            
+            showLoading(true);
+            try {
+                const response = await fetch('https://api.giphy.com/v1/gifs/favorites', {
+                    headers: {
+                        'Authorization': `Bearer ${giphyAccessToken}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load GIFs');
+                
+                const data = await response.json();
+                loginBtn.style.display = 'none';
+                myGifsGrid.style.display = 'grid';
+                
+                if (data.data.length === 0) {
+                    myGifsGrid.innerHTML = '<div class="empty-state">No saved GIFs yet!</div>';
+                } else {
+                    appendResults(data.data, myGifsGrid);
+                }
+            } catch (error) {
+                console.error('Error loading user GIFs:', error);
+                myGifsGrid.innerHTML = '<div class="empty-state">Failed to load your GIFs 😢</div>';
+            } finally {
+                showLoading(false);
+            }
+        }
     </script>
 </body>
 </html> 
