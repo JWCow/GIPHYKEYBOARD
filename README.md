@@ -1,4 +1,25 @@
-# GIPHY Keyboard for Windows 🎮
+# GIPHY Keyboard for Windows
+
+A modern, sleek GIPHY client for Windows that makes it easy to search, save, and use GIFs.
+
+## Latest Version: 1.0.8
+
+### Features
+- 🔍 Explore GIFs with instant search
+- ✨ Browse trending GIFs and categories
+- ❤️ Save your favorite GIFs
+- ⭐ Build your personal GIF collection
+- 📥 Export your GIF collections
+- 📤 Import GIF collections
+- 🎨 Modern dark theme interface
+- ⌨️ Keyboard shortcuts for quick access
+
+### Recent Updates (v1.0.8)
+- Improved UI consistency
+- Enhanced dark theme
+- Better input field styling
+- Smoother animations
+- Updated tab navigation
 
 <div align="center">
 
@@ -11,25 +32,32 @@
 
 <table>
 <tr>
-<td width="33%">
+<td width="25%">
 
-### 🔍 Search
-![Search Interface](screenshots/search.png)
-*Search millions of GIFs with instant results*
-
-</td>
-<td width="33%">
-
-### 💡 Ideas
-![GIF Ideas](screenshots/ideas.png)
-*Discover trending categories and reactions*
+### 🔍 Explore
+![Explore Tab](screenshots/explore.png)
+*Search millions of GIFs instantly*
 
 </td>
-<td width="33%">
+<td width="25%">
+
+### ✨ Trending
+![Trending Tab](screenshots/trending.png)
+*Discover trending GIFs and reactions*
+
+</td>
+<td width="25%">
 
 ### ❤️ Favorites
-![My Favorites](screenshots/favorites.png)
-*Save your favorite GIFs for quick access*
+![Favorites Tab](screenshots/favorites.png)
+*Save your most-loved GIFs*
+
+</td>
+<td width="25%">
+
+### ⭐ Collection
+![Collection Tab](screenshots/collection.png)
+*Build your personal GIF library*
 
 </td>
 </tr>
