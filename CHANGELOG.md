@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.0.11] - 2024-01-24
+
+### Added
+- Intuitive hover buttons for quick actions (copy and download)
+- Smart GIF compression for optimal file sizes
+- Improved GIF handling with automatic size optimization
+- Enhanced performance for large GIFs
+
+### Changed
+- Updated UI with hover effects and action messages
+- Improved download handling with size optimization
+- Better visual feedback for user actions
+
+### Fixed
+- Optimized GIF compression while preserving quality
+- Improved handling of large GIFs
+
+## [1.0.10] - 2024-01-20
+
+### Added
+- Enhanced GIF compression algorithm
+- Improved file size handling
+- Better support for large GIFs
+
+### Changed
+- Updated GIF processing workflow
+- Improved download experience
+- Enhanced error handling
+
 ## [1.0.9] - 2024-01-09
 
 ### Added

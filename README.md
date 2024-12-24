@@ -4,7 +4,7 @@ A modern, sleek GIPHY client for Windows that makes it easy to search, save, and
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
+[![Version](https://img.shields.io/badge/version-1.0.11-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows)
 [![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)](https://www.autohotkey.com/)
@@ -51,7 +51,7 @@ A modern, sleek GIPHY client for Windows that makes it easy to search, save, and
 * 🎯 Quick keyboard shortcut to open/close (Win + C)
 * 🔍 Fast GIF search with instant results
 * 💡 GIF Ideas tab with trending categories and popular reactions
-* 📋 Copy GIF URLs to clipboard with a single click
+* ��� Copy GIF URLs to clipboard with a single click
 * ⭐ Save and manage your favorite GIFs
 * 🔗 Add any GIPHY URL to your collection
 * 🌙 Clean, modern dark mode interface
@@ -64,11 +64,11 @@ A modern, sleek GIPHY client for Windows that makes it easy to search, save, and
 
 ## 📦 Latest Updates
 
+- **[v1.0.11](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.11)** - Added hover buttons and GIF compression
+- **[v1.0.10](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.10)** - Improved GIF handling and compression
+- **[v1.0.9](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.9)** - Enhanced UI and performance
 - **[v1.0.8](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.8)** - Improved UI consistency and dark theme
 - **[v1.0.7](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.7)** - Enhanced My GIFs management
-- **[v1.0.6](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.6)** - Added separate My Favorites tab
-- **[v1.0.5](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.5)** - Improved grid layout and GIF display
-- **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support
 
 [View full changelog →](CHANGELOG.md)
 
@@ -141,7 +141,7 @@ MIT License - feel free to modify and share!
 * [CHANGELOG.md](CHANGELOG.md) - Version history and updates
 
 ## Latest Updates
-Check out [Version 1.0.9](CHANGELOG.md#109---2024-01-09) for the latest improvements including:
-- Smart GIF compression and size optimization
-- Hover buttons for copying and downloading
-- Better handling of private GIFs
+Check out [Version 1.0.11](CHANGELOG.md#1011---2024-01-24) for the latest improvements including:
+- Intuitive hover buttons for quick actions (copy and download)
+- Smart GIF compression for optimal file sizes
+- Improved GIF handling and performance optimizations
