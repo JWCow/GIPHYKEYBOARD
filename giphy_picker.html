@@ -55,6 +55,8 @@
             flex-direction: column;
             gap: 12px;
             flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
         }
 
         .search-bar {
@@ -159,11 +161,11 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            overflow-y: auto;
             padding: 8px;
             border-radius: var(--radius-md);
             background: var(--bg-light);
-            max-height: calc(100vh - 200px);
+            min-height: 200px;
+            overflow: visible;
             grid-auto-flow: dense;
         }
 
@@ -543,11 +545,11 @@
             searchInput.focus();
         };
 
-        // Add scroll event listener
-        document.getElementById('main-container').addEventListener('scroll', () => {
+        // Update scroll event listener
+        document.querySelector('.search-content').addEventListener('scroll', () => {
             if (isLoading || !currentQuery) return;
             
-            const container = document.getElementById('main-container');
+            const container = document.querySelector('.search-content');
             const scrollPosition = container.scrollTop + container.clientHeight;
             const scrollHeight = container.scrollHeight;
             
