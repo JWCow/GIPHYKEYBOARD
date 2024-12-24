@@ -401,32 +401,33 @@
         .url-input {
             flex: 1;
             min-width: 200px;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: 2px solid transparent;
+            padding: 8px 12px;
+            border: none;
             border-radius: var(--radius-md);
             background: var(--bg-darker);
             color: var(--text-primary);
+            font-size: 14px;
             outline: none;
             transition: var(--transition);
         }
 
-        .url-input:focus {
-            border-color: var(--primary-color);
-            background: var(--bg-darker);
+        .url-input::placeholder {
+            color: var(--text-secondary);
+            font-size: 13px;
         }
 
         .add-url-btn {
-            flex: 0 0 auto;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-md);
             background: var(--primary-color);
             color: var(--bg-dark);
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            border: none;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 500;
             transition: var(--transition);
             white-space: nowrap;
+            flex: 0 0 auto;
             min-width: fit-content;
         }
 
@@ -501,14 +502,11 @@
         <div id="my-gifs-container">
             <div class="upload-section">
                 <div class="giphy-url-input">
-                    <input type="text" id="giphy-url" placeholder="Paste custom GIPHY URL here..." class="url-input">
-                    <button onclick="addGiphyUrl()" class="add-url-btn">Add to My GIFs</button>
+                    <input type="text" id="giphy-url-input" class="url-input" placeholder="Paste GIPHY URL" />
+                    <button id="add-url-btn" class="add-url-btn">Add to My GIFs</button>
                 </div>
-                <div class="url-hint">Example: https://media.giphy.com/media/custom_gif/giphy.gif</div>
             </div>
-            <div id="my-gifs-grid" style="display: grid;">
-                <!-- User's GIFs will be loaded here -->
-            </div>
+            <div id="my-gifs-grid"></div>
         </div>
 
         <div id="results">
@@ -974,7 +972,7 @@
         }
 
         async function addGiphyUrl() {
-            const input = document.getElementById('giphy-url');
+            const input = document.getElementById('giphy-url-input');
             const url = input.value.trim();
             
             if (!url) {
@@ -1106,7 +1104,7 @@
         }
 
         // Add keyboard event listener for the URL input
-        document.getElementById('giphy-url').addEventListener('keypress', (event) => {
+        document.getElementById('giphy-url-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 addGiphyUrl();
             }

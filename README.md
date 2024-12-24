@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
+[![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows)
 [![AutoHotkey](https://img.shields.io/badge/AutoHotkey-1.1-red.svg)](https://www.autohotkey.com/)
@@ -39,6 +39,7 @@
 
 ## 📦 Latest Updates
 
+- **[v1.0.5](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.5)** - Improved grid layout and GIF display
 - **[v1.0.4](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.4)** - Added custom GIPHY URL support and improved UI responsiveness
 - **[v1.0.3](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.3)** - Added favorite GIFs functionality with local storage
 - **[v1.0.2](https://github.com/JWCow/GIPHYKEYBOARD-for-Windows/releases/tag/v1.0.2)** - Universal browser support and optimizations
