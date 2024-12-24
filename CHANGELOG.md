@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.6] - 2024-01-14
+### Added
+- New "My Favorites" tab with heart icon
+- Separate storage system for favorites and My GIFs
+- Heart button in search tab for adding to favorites
+- Independent functionality between My GIFs and My Favorites tabs
+
+### Changed
+- Moved My GIFs tab to last position
+- Updated favorite button to use heart emoji
+- Improved tab organization for better workflow
+- Enhanced storage management for better separation of concerns
+
 ## [1.0.5] - 2023-12-24
 ### Changed
 - Improved grid layout for better space utilization
