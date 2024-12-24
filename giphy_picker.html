@@ -54,7 +54,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            min-height: 0;
+            flex: 1;
         }
 
         .search-bar {
@@ -65,7 +65,7 @@
         }
 
         .upload-section {
-            margin: 0 0 12px 0;
+            margin: 0;
             padding: 12px;
             background: var(--bg-light);
             border-radius: var(--radius-md);
@@ -80,6 +80,7 @@
             background: var(--bg-light);
             min-height: 200px;
             overflow: visible;
+            grid-auto-flow: dense;
         }
 
         #my-gifs-container {
@@ -233,14 +234,11 @@
         }
 
         .gif-item img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
             transition: var(--transition);
-            background: var(--bg-darker);
         }
 
         .gif-item:hover img {
@@ -463,9 +461,9 @@
         <div class="search-content">
             <div id="search-container">
                 <input type="text" id="search-input" placeholder="Search GIFs..." autofocus>
-            </div>
-            <div id="recent-searches" class="recent-searches">
-                <!-- Recent searches will be added here dynamically -->
+                <div id="recent-searches" class="recent-searches">
+                    <!-- Recent searches will be added here dynamically -->
+                </div>
             </div>
             <div id="results">
                 <div class="empty-state">
@@ -547,13 +545,14 @@
 
         // Add scroll event listener
         document.getElementById('main-container').addEventListener('scroll', () => {
-            if (isLoading) return;
+            if (isLoading || !currentQuery) return;
             
             const container = document.getElementById('main-container');
             const scrollPosition = container.scrollTop + container.clientHeight;
             const scrollHeight = container.scrollHeight;
             
-            if (scrollHeight - scrollPosition < 100) {
+            // Load more when we're near the bottom (within 200px)
+            if (scrollHeight - scrollPosition < 200) {
                 loadMoreGifs();
             }
         });
@@ -591,12 +590,15 @@
             
             isLoading = true;
             showLoading(true);
-            currentOffset += 10;
             
             try {
-                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=10&offset=${currentOffset}&rating=g&lang=en`);
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=20&offset=${currentOffset}&rating=g&lang=en`);
                 const data = await response.json();
-                appendResults(data.data);
+                
+                if (data.data.length > 0) {
+                    appendResults(data.data);
+                    currentOffset += data.data.length;
+                }
             } catch (error) {
                 console.error('Error fetching more GIFs:', error);
                 showError('Failed to load more GIFs');
