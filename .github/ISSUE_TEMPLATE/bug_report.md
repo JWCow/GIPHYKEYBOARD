@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
+title: '[BUG] '
 labels: bug
 assignees: ''
 
@@ -12,9 +12,9 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Press 'Win + C'
-2. Type '...'
-3. Click on '...'
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
 4. See error
 
 **Expected behavior**
@@ -24,9 +24,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **System Information:**
- - Windows Version: [e.g. Windows 11 22H2]
- - Browser: [e.g. Chrome 120, Edge 120]
- - AutoHotkey Version: [e.g. 1.1.37.01]
+ - OS: [e.g. Windows 10]
+ - Browser: [e.g. Chrome, Edge]
+ - Version: [e.g. 1.0.4]
+ - AutoHotkey Version: [e.g. 1.1.37]
 
 **Additional context**
 Add any other context about the problem here.
