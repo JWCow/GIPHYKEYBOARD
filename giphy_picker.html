@@ -153,13 +153,32 @@
             width: 100%;
             background: var(--bg-darker);
             box-shadow: var(--shadow);
+            break-inside: avoid;
+            page-break-inside: avoid;
+            display: flex;
+            flex-direction: column;
         }
 
-        .favorite-btn {
+        .gif-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: var(--transition);
+            object-fit: cover;
+            flex: 1;
+        }
+
+        .gif-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .favorite-btn, .delete-gif {
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             border: none;
             border-radius: 50%;
             width: 32px;
@@ -171,32 +190,42 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            z-index: 2;
+            z-index: 3;
+            backdrop-filter: blur(4px);
         }
 
-        .favorite-btn:hover {
+        .delete-gif {
+            right: auto;
+            left: 8px;
+            background: rgba(255, 0, 0, 0.6);
+            color: white;
+        }
+
+        .favorite-btn:hover, .delete-gif:hover {
             transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
         }
 
-        .favorite-btn.active {
-            color: var(--primary-color);
+        .delete-gif:hover {
+            background: rgba(255, 0, 0, 0.8);
         }
 
-        .gif-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .gif-item img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .copy-tooltip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
             transition: var(--transition);
-        }
-
-        .gif-item:hover img {
-            filter: brightness(1.1);
+            z-index: 4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
         }
 
         .tabs {
@@ -325,19 +354,23 @@
         }
 
         #my-gifs-container {
-            display: none;
+            display: flex;
             flex-direction: column;
             flex: 1;
             overflow: hidden;
-            padding: 20px;
+            padding: 16px;
+            gap: 0;
         }
 
         .upload-section {
-            margin: 20px 0;
-            text-align: center;
+            margin: 0 0 16px 0;
             padding: 16px;
             background: var(--bg-light);
             border-radius: var(--radius-md);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(8px);
         }
 
         .upload-button {
@@ -443,7 +476,7 @@
 
         #my-gifs-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 12px;
             overflow-y: auto;
             padding: 8px;
@@ -452,6 +485,19 @@
             max-height: calc(100vh - 250px);
             flex: 1;
             grid-auto-flow: dense;
+            align-items: start;
+        }
+
+        @media (min-width: 768px) {
+            #my-gifs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (min-width: 1200px) {
+            #my-gifs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
         }
     </style>
 </head>
