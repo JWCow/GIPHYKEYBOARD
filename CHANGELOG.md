@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.0.4] - 2023-12-24
+### Added
+- Custom GIPHY URL support in My GIFs tab
+- Ability to add any GIPHY URL to favorites
+- Support for private and public GIPHY URLs
+- Improved URL parsing and validation
+- Better error handling for invalid URLs
+
+### Changed
+- Updated UI text for better clarity
+- Enhanced GIF management in My GIFs tab
+- Improved error messages
+
+## [1.0.3] - 2023-12-23
+### Added
+- Favorite GIFs functionality
+- Local storage for saved GIFs
+- My GIFs tab for managing favorites
+- Star button for favoriting GIFs
+- Timestamp-based sorting for favorites
+
+### Changed
+- Updated UI to include favorites section
+- Enhanced GIF management features
+- Improved local storage handling
+
 ## [1.0.2] - 2024-01-14
 ### Added
 - Universal browser support (Chrome, Edge, Firefox)
