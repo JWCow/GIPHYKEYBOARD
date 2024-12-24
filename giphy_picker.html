@@ -35,6 +35,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            margin: 0;
         }
 
         #main-container {
@@ -47,18 +48,7 @@
             border-radius: var(--radius-md);
             margin: 8px;
             box-shadow: var(--shadow);
-            max-height: calc(100vh - 32px);
-        }
-
-        .tab-content {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            flex-direction: column;
-        }
-
-        .tab-content.active {
-            display: flex;
+            height: calc(100vh - 32px);
         }
 
         #search-container {
@@ -86,8 +76,6 @@
         #ideas-container {
             margin-bottom: 16px;
             animation: fadeIn 0.3s ease;
-            overflow-y: auto;
-            padding: 16px;
         }
 
         .ideas-section {
@@ -130,12 +118,13 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            overflow-y: auto;
-            padding: 8px;
+            gap: 16px;
+            overflow-y: scroll;
+            padding: 16px;
             border-radius: var(--radius-md);
             background: var(--bg-light);
-            margin-top: 12px;
+            min-height: 0;
+            max-height: 100%;
         }
 
         #results::-webkit-scrollbar {
@@ -165,6 +154,7 @@
             width: 100%;
             background: var(--bg-darker);
             box-shadow: var(--shadow);
+            height: 200px;
         }
 
         .favorite-btn {
@@ -202,7 +192,8 @@
 
         .gif-item img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
             transition: var(--transition);
         }
@@ -340,13 +331,14 @@
             display: none;
             flex-direction: column;
             flex: 1;
-            overflow-y: auto;
-            padding: 16px;
+            overflow: hidden;
+            padding: 20px;
         }
 
         .upload-section {
-            margin: 0 0 12px 0;
-            padding: 12px;
+            margin: 20px 0;
+            text-align: center;
+            padding: 16px;
             background: var(--bg-light);
             border-radius: var(--radius-md);
         }
@@ -465,47 +457,6 @@
             flex: 1;
             grid-auto-flow: dense;
         }
-
-        .search-bar {
-            padding: 16px;
-            background: var(--bg-light);
-            border-radius: var(--radius-md);
-            margin-bottom: 12px;
-        }
-
-        .upload-section {
-            margin: 0 0 12px 0;
-            padding: 12px;
-            background: var(--bg-light);
-            border-radius: var(--radius-md);
-        }
-
-        #my-gifs-container {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        #results {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            overflow-y: auto;
-            padding: 8px;
-            border-radius: var(--radius-md);
-            background: var(--bg-light);
-            margin-top: 12px;
-        }
-
-        #ideas-container {
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease;
-            overflow-y: auto;
-            padding: 16px;
-        }
     </style>
 </head>
 <body>
@@ -604,10 +555,12 @@
         resultsDiv.addEventListener('scroll', () => {
             if (isLoading) return;
             
-            const scrollPosition = resultsDiv.scrollTop + resultsDiv.clientHeight;
+            const scrollPosition = resultsDiv.scrollTop;
             const scrollHeight = resultsDiv.scrollHeight;
+            const clientHeight = resultsDiv.clientHeight;
             
-            if (scrollHeight - scrollPosition < 100) {
+            // Load more when user scrolls near bottom (within 200px of bottom)
+            if (scrollHeight - (scrollPosition + clientHeight) < 200) {
                 loadMoreGifs();
             }
         });
@@ -645,12 +598,15 @@
             
             isLoading = true;
             showLoading(true);
-            currentOffset += 10;
             
             try {
                 const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(currentQuery)}&limit=10&offset=${currentOffset}`);
                 const data = await response.json();
-                appendResults(data.data);
+                
+                if (data.data.length > 0) {
+                    appendResults(data.data);
+                    currentOffset += 10;
+                }
             } catch (error) {
                 console.error('Error fetching more GIFs:', error);
                 showError('Failed to load more GIFs');
